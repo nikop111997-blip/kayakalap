@@ -118,7 +118,7 @@ export async function POST(req) {
     const db = client.db("kayakalap")
 
     const result = await db.collection("contacts").insertOne({
-      name: name.trim(),,
+      name: name.trim(),
       email: trimmedEmail,
       phone: trimmedPhone,
       age: age,
