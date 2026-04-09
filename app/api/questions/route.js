@@ -77,6 +77,74 @@ export async function POST(req) {
     )
   }
 }
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url)
+
+    const page = parseInt(searchParams.get("page")) || 1
+    const limit = parseInt(searchParams.get("limit")) || 20
+    const search = searchParams.get("search") || ""
+
+    const skip = (page - 1) * limit
+
+    const client = await clientPromise
+    const db = client.db("kayakalap")
+
+    // 🔍 SEARCH FILTER
+    let query = {}
+
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { whatsapp: { $regex: search, $options: "i" } },
+        ],
+      }
+    }
+
+    // 📊 FETCH DATA
+    const leads = await db
+      .collection("leads")
+      .find(query)
+      .sort({ createdAt: -1 }) // latest first
+      .skip(skip)
+      .limit(limit)
+      .toArray()
+
+    // 📊 TOTAL COUNT
+    const total = await db.collection("leads").countDocuments(query)
+
+    const pages = Math.ceil(total / limit)
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: leads,
+        page,
+        pages,
+        total,
+      }),
+      {
+        status: 200,
+        headers: corsHeaders(),
+      }
+    )
+  } catch (error) {
+    console.error("GET API ERROR:", error)
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: "Internal Server Error",
+      }),
+      {
+        status: 500,
+        headers: corsHeaders(),
+      }
+    )
+  }
+}
 
 // ✅ HANDLE PREFLIGHT (IMPORTANT)
 export async function OPTIONS() {
