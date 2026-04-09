@@ -26,8 +26,7 @@ export async function GET(req) {
     const query = search
       ? {
           $or: [
-            { firstName: { $regex: search, $options: "i" } },
-            { lastName: { $regex: search, $options: "i" } },
+            { name: { $regex: search, $options: "i" } },
             { email: { $regex: search, $options: "i" } },
             { phone: { $regex: search, $options: "i" } },
             { ip: { $regex: search, $options: "i" } }
@@ -66,11 +65,10 @@ export async function POST(req) {
     const body = await req.json()
 
     const {
-      firstName,
-      lastName,
+      name,
       email,
       phone,
-      message,
+      age,
     } = body
 
     // ================= TRIM VALUES =================
@@ -79,11 +77,9 @@ export async function POST(req) {
 
     // ================= VALIDATION =================
     if (
-      !firstName?.trim() ||
-      !lastName?.trim() ||
+      !name?.trim() ||
       !trimmedEmail ||
-      !trimmedPhone ||
-      !message?.trim()
+      !trimmedPhone
     ) {
       return Response.json(
         { success: false, error: "All fields are required." },
@@ -122,11 +118,10 @@ export async function POST(req) {
     const db = client.db("kayakalap")
 
     const result = await db.collection("contacts").insertOne({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
+      name: name.trim(),,
       email: trimmedEmail,
       phone: trimmedPhone,
-      message: message.trim(),
+      age: age,
       ip,
       userAgent,
       createdAt: new Date(),
