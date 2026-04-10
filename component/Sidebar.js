@@ -59,7 +59,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           <div className="flex items-center gap-2.5 overflow-hidden pl-2">
         
             <span className="font-bold text-lg text-gray-900 uppercase">
-              Admin Kalakalp
+              Admin Kayapalat
             </span>
           </div>
         )}

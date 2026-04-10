@@ -85,8 +85,20 @@ export default function ContactsPage() {
       accessor: "phone"
     },
     {
-      label: "IP",
-      accessor: "ip"
+      label: "Booking Date",
+      accessor: "date"
+    },
+    {
+      label: "Goal",
+      accessor: "goal"
+    },
+    {
+      label: "Program",
+      accessor: "program"
+    },
+    {
+      label: "Message",
+      accessor: "message"
     },
     {
       label: "Created",
