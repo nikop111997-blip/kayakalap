@@ -96,7 +96,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           label="Blogs" 
           collapsed={collapsed} 
           active={pathname.includes("/admin/blogs")}
-        />
+        /> 
         <NavItem 
           href="/admin/categories" 
           icon={FileText} 
