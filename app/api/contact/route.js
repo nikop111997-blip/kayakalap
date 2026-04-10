@@ -62,50 +62,72 @@ export async function GET(req) {
 }
 export async function POST(req) {
   try {
+    // ================= CORS HEADERS =================
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    }
+
     const body = await req.json()
 
     const {
       name,
       email,
       phone,
-      age,
+      date,
+      goal,
+      program,
+      message,
     } = body
 
-    // ================= TRIM VALUES =================
+    // ================= TRIM =================
+    const trimmedName = name?.trim()
     const trimmedEmail = email?.trim()
-    const trimmedPhone = phone?.trim()
+
+    // ================= CLEAN PHONE =================
+    let cleanedPhone = phone?.replace(/\D/g, "")
+
+    if (cleanedPhone?.startsWith("91") && cleanedPhone.length > 10) {
+      cleanedPhone = cleanedPhone.slice(-10)
+    }
 
     // ================= VALIDATION =================
-    if (
-      !name?.trim() ||
-      !trimmedEmail ||
-      !trimmedPhone
-    ) {
-      return Response.json(
-        { success: false, error: "All fields are required." },
-        { status: 400 }
+    if (!trimmedName || !trimmedEmail || !cleanedPhone) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Name, Email, and Phone are required.",
+        }),
+        { status: 400, headers: corsHeaders }
       )
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(trimmedEmail)) {
-      return Response.json(
-        { success: false, error: "Invalid email format." },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Invalid email format.",
+        }),
+        { status: 400, headers: corsHeaders }
       )
     }
 
-    // Indian phone validation
+    // Phone validation (Indian)
     const phoneRegex = /^[6-9]\d{9}$/
-    if (!phoneRegex.test(trimmedPhone)) {
-      return Response.json(
-        { success: false, error: "Invalid mobile number." },
-        { status: 400 }
+    if (!phoneRegex.test(cleanedPhone)) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Invalid mobile number.",
+        }),
+        { status: 400, headers: corsHeaders }
       )
     }
 
-    // ================= GET IP ADDRESS =================
+    // ================= GET IP =================
     const forwarded = req.headers.get("x-forwarded-for")
     const ip = forwarded
       ? forwarded.split(",")[0]
@@ -113,35 +135,55 @@ export async function POST(req) {
 
     const userAgent = req.headers.get("user-agent") || "Unknown"
 
-    // ================= SAVE TO DB =================
+    // ================= SAVE =================
     const client = await clientPromise
     const db = client.db("kayakalap")
 
     const result = await db.collection("contacts").insertOne({
-      name: name.trim(),
+      name: trimmedName,
       email: trimmedEmail,
-      phone: trimmedPhone,
-      age: age,
+      phone: cleanedPhone,
+      date: date || null,
+      goal: goal || null,
+      program: program || null,
+      message: message || null,
       ip,
       userAgent,
       createdAt: new Date(),
     })
 
-    return Response.json(
-      {
+    return new Response(
+      JSON.stringify({
         success: true,
         insertedId: result.insertedId,
-      },
-      { status: 201 }
+      }),
+      { status: 201, headers: corsHeaders }
     )
 
   } catch (error) {
-    return Response.json(
-      {
+    return new Response(
+      JSON.stringify({
         success: false,
         error: "Server error. Please try again later.",
-      },
-      { status: 500 }
+      }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     )
   }
+}
+
+// ✅ Handle preflight request (VERY IMPORTANT for CORS)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  })
 }
