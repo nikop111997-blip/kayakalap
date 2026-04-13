@@ -14,7 +14,8 @@ import {
   File,
   LogOutIcon,
   FileQuestion,
-  MailCheck
+  MailCheck,
+  UserCheck
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -59,7 +60,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         {!collapsed && (
           <div className="flex items-center gap-2.5 overflow-hidden pl-2">
         
-            <Image src={'/logok.jpg'} width={300} height={100} alt="logo" />
+            <Image src={'/logo.avif'} width={300} height={100} alt="logo" />
           </div>
         )}
         <button
@@ -120,7 +121,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         {session?.user?.role === 'admin' && (
           <NavItem 
             href="/staff" 
-            icon={Settings} 
+            icon={UserCheck} 
             label="Staff" 
             collapsed={collapsed} 
             active={pathname.includes("/staff")}
