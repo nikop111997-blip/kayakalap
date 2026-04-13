@@ -118,6 +118,20 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           collapsed={collapsed} 
           active={pathname.includes("/newsletter")} 
         />
+        <NavItem 
+          href="/blogs" // Update these paths to match your actual routing
+          icon={File} 
+          label="Blogs" 
+          collapsed={collapsed} 
+          active={pathname === "/blogs"}
+        />
+        <NavItem 
+          href="/categories" // Update these paths to match your actual routing
+          icon={FileText} 
+          label="Blog Categories" 
+          collapsed={collapsed} 
+          active={pathname === "/categories"}
+        />
         {session?.user?.role === 'admin' && (
           <NavItem 
             href="/staff" 
