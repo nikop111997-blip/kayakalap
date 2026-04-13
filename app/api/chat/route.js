@@ -1,9 +1,4 @@
 import clientPromise from '@/lib/mongodb';
-import fs from "fs"
-import path from "path"
-
-const kbPath = path.join(process.cwd(), "Kayapalat-Chatbot-Knowledge-Base.md")
-const knowledgeBase = fs.readFileSync(kbPath, "utf-8")
 export const dynamic = 'force-dynamic';
 
 // ✅ CORS HEADERS
