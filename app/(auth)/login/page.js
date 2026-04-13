@@ -60,7 +60,7 @@ export default function LoginPage() {
   <div className="hidden md:block md:w-1/2 relative bg-gray-200">
     <Image 
       loading="eager" 
-      src={`https://images.unsplash.com/photo-1519332978332-21b7d621d05e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`} 
+      src={`/login.png`} 
       alt="login"
       fill
       className="absolute inset-0 w-full h-full object-cover" 

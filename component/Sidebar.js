@@ -148,11 +148,13 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} mb-3`}>
           {/* Avatar - Always visible */}
           <Link href="/profile" className="shrink-0">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center shadow-inner hover:opacity-90 transition-opacity">
-              <span className="text-amber-50 font-bold text-lg">
+              {session?.user?.role === 'admin' ?
+              <Image src={'/own.avif'} height={32} width={32} alt="admin" className="rounded-full" />
+              :<div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center shadow-inner hover:opacity-90 transition-opacity">
+             <span className="text-amber-50 font-bold text-lg">
                 {session?.user?.name?.charAt(0).toUpperCase() || "A"}
-              </span>
-            </div>
+              </span> 
+            </div>}
           </Link>
           
           {/* User Info - Hidden when collapsed */}

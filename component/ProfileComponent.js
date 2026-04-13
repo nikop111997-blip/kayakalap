@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import toast from "react-hot-toast"
 import BackButton from "@/lib/BackButton"
+import Image from "next/image"
 
 export default function ProfilePage({session}) {
   const [loading, setLoading] = useState(true)
@@ -284,9 +285,11 @@ export default function ProfilePage({session}) {
           {/* LEFT COLUMN: User Summary Card */}
           <div className="md:col-span-4 space-y-6">
             <div className="bg-white rounded-[1rem] p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-green-50 text-green-900 rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-sm">
+                {session?.user?.role === 'admin' ?
+              <Image src={'/own.avif'} height={128} width={128} alt="admin" className="rounded-full mb-3" />
+              :<div className="w-24 h-24 bg-blue-50 text-blue-900 rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-sm">
                 {profile.name.charAt(0).toUpperCase()}
-              </div>
+              </div> }
               <h2 className="text-xl font-semibold text-gray-900">{profile.name}</h2>
               <p className="text-sm text-gray-500 mb-4">{profile.email}</p>
               
@@ -427,7 +430,7 @@ export default function ProfilePage({session}) {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 bg-green-900 hover:bg-green-800 text-white font-medium rounded-xl transition-colors flex items-center gap-2 disabled:opacity-70"
+                  className="px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-medium rounded-xl transition-colors flex items-center gap-2 disabled:opacity-70"
                 >
                   {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={18} />}
                   {saving ? 'Saving...' : 'Save Changes'}
