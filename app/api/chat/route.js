@@ -169,8 +169,8 @@ When users ask about results or credibility, rely on these verified statistics:
         model: 'sarvam-m',
         messages: finalMessageArray,
         stream: true,
-        temperature: 0.1, // Low temperature for strict obedience to the rules
-        max_tokens: 150
+        temperature: 0.6, // Low temperature for strict obedience to the rules
+        max_tokens: 250
       }),
     });
 
