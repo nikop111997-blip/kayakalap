@@ -3,9 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
 
 export async function GET(req) {
-
   try {
-
     const session = await getServerSession(authOptions)
 
     if (!session || session.user.role !== "admin") {
@@ -18,47 +16,97 @@ export async function GET(req) {
     const limit = parseInt(searchParams.get("limit")) || 20
     const search = searchParams.get("search") || ""
 
+    const sort = searchParams.get("sort")
+    const fromDate = searchParams.get("fromDate")
+    const toDate = searchParams.get("toDate")
+
+    const status = searchParams.get("status")
+    const goal = searchParams.get("goal")
+    const program = searchParams.get("program")
+    const dateFilter = searchParams.get("dateFilter")
+
     const skip = (page - 1) * limit
 
     const client = await clientPromise
     const db = client.db("kayakalap")
 
-    const query = search
-      ? {
-          $or: [
-            { name: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-            { phone: { $regex: search, $options: "i" } },
-            { ip: { $regex: search, $options: "i" } }
-          ]
-        }
-      : {}
+    let query = {}
+
+    // 🔍 Search
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { ip: { $regex: search, $options: "i" } }
+      ]
+    }
+
+    // 🎯 Filters
+    if (status) query.status = status
+    if (goal) query.goal = goal
+    if (program) query.program = program
+
+    // 📅 Date Handling (PRIORITY LOGIC)
+
+    // 👉 Custom date range (highest priority)
+    if (fromDate || toDate) {
+      query.createdAt = {}
+
+      if (fromDate) {
+        query.createdAt.$gte = new Date(fromDate)
+      }
+
+      if (toDate) {
+        const to = new Date(toDate)
+        to.setHours(23, 59, 59, 999)
+        query.createdAt.$lte = to
+      }
+    }
+
+    // 👉 Quick filters (only if no custom date)
+    else if (dateFilter && dateFilter !== "All") {
+      const now = new Date()
+      let from = new Date()
+
+      if (dateFilter === "Today") {
+        from.setHours(0, 0, 0, 0)
+      } else if (dateFilter === "Last3") {
+        from.setDate(now.getDate() - 3)
+      } else if (dateFilter === "Last7") {
+        from.setDate(now.getDate() - 7)
+      } else if (dateFilter === "Last30") {
+        from.setDate(now.getDate() - 30)
+      }
+
+      query.createdAt = { $gte: from }
+    }
+
+    // 🔽 Sorting
+    let sortOption = { createdAt: -1 }
+
+    if (sort === "oldest") sortOption = { createdAt: 1 }
+    if (sort === "name") sortOption = { name: 1 }
 
     const contacts = await db
       .collection("contacts")
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOption) // ✅ FIXED
       .skip(skip)
       .limit(limit)
       .toArray()
 
     const total = await db.collection("contacts").countDocuments(query)
 
-    const pages = Math.ceil(total / limit)
-
     return Response.json({
       data: contacts,
-      pages
+      pages: Math.ceil(total / limit)
     })
 
   } catch (error) {
-
     console.error(error)
-
     return Response.json({ error: true })
-
   }
-
 }
 export async function POST(req) {
   try {

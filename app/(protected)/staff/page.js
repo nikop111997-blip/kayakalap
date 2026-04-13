@@ -125,14 +125,14 @@ export default function UsersPage() {
       accessor: "name",
       render: (val, row) => (
         <div className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-full bg-green-100 text-green-900 flex items-center justify-center font-bold text-sm shrink-0">
+          <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm shrink-0">
             {val?.charAt(0).toUpperCase() || <UserCircle size={20} />}
           </div>
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-900">{val}</span>
             <button 
               onClick={() => openEdit(row, "name", val)}
-              className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-md transition-all"
+              className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all"
             >
               <Edit2 size={14} />
             </button>
@@ -154,7 +154,7 @@ export default function UsersPage() {
             {row.mobile || "N/A"}
             <button 
               onClick={() => openEdit(row, "mobile", row.mobile)}
-              className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-all ml-1"
+              className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-all ml-1"
             >
               <Edit2 size={12} />
             </button>
@@ -169,7 +169,7 @@ export default function UsersPage() {
         <div className="flex items-center gap-2 group w-fit">
           <span className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${
               val === "admin"
-                ? "bg-green-50 text-green-900 border-green-200"
+                ? "bg-blue-50 text-blue-900 border-blue-200"
                 : "bg-gray-50 text-gray-700 border-gray-200"
             }`}
           >
@@ -226,7 +226,7 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Staff Management</h1>
           <p className="text-sm text-gray-500 mt-1">Manage user roles, statuses, and account access.</p>
         </div>
-          <Link href={"/register"} className="border border-green-300 flex items-center gap-2 rounded-xl px-4 py-2 bg-green-50 text-green-600">
+          <Link href={"/register"} className="border border-blue-300 flex items-center gap-2 rounded-xl px-4 py-2 bg-blue-50 text-blue-600">
           <UserPlus className="h-4 w-4"/>Add User
           </Link>
         </div>
@@ -245,7 +245,7 @@ export default function UsersPage() {
                 onClick={() => openPassword(row)}
                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm ml-auto"
               >
-                <KeyRound size={14} className="text-green-500" />
+                <KeyRound size={14} className="text-blue-500" />
                 Reset
               </button>
             )}

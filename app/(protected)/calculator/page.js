@@ -38,7 +38,7 @@ const DataTable = ({ columns, data, onRowClick }) => (
           <tr
             key={i}
             onClick={() => onRowClick(row)}
-            className="border-b border-gray-100 hover:bg-green-50/50 cursor-pointer transition-colors"
+            className="border-b border-gray-100 hover:bg-blue-50/50 cursor-pointer transition-colors"
           >
             {columns.map((c, j) => (
               <td key={j} className="p-4 text-sm text-gray-800">
@@ -172,7 +172,7 @@ export default function ContactsPage() {
       label: "Score",
       accessor: "score",
       render: (val) => (
-        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-gray-900 rounded">
+        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-[#05335c] rounded">
           {val}
         </span>
       )
@@ -193,7 +193,7 @@ export default function ContactsPage() {
         <div className="space-y-6 mt-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-800">
-              Leads Management
+              Calculator User Management
             </h1>
 
             {/* Search */}
@@ -203,7 +203,7 @@ export default function ContactsPage() {
                 placeholder="Search name, email, phone..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border border-gray-300 rounded-lg pl-10 pr-4 py-2 bg-white w-full focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500 transition-all"
+                className="border border-gray-300 rounded-lg pl-10 pr-4 py-2 bg-white w-full focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
               />
               <Mail className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
             </div>
@@ -303,7 +303,7 @@ export default function ContactsPage() {
                     <div className="grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Score</span>
                       <span className="col-span-2">
-                        <span className="inline-flex items-center justify-center px-3 py-1 text-sm font-bold text-white bg-green-600 rounded-full shadow-sm">
+                        <span className="inline-flex items-center justify-center px-3 py-1 text-sm font-bold text-white bg-blue-600 rounded-full shadow-sm">
                           {selectedLead.score} Points
                         </span>
                       </span>
@@ -336,36 +336,36 @@ export default function ContactsPage() {
                 <h3 className="font-semibold text-lg text-gray-900 mb-4 pb-2 border-b border-gray-100">Complete Quiz Answers</h3>
                 
                 <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100/50 shadow-sm transition-all hover:border-green-200">
-                    <span className="font-bold text-green-900 block mb-2 text-sm">Q1: Managing Daily Stress</span>
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm transition-all hover:border-blue-200">
+                    <span className="font-bold text-blue-900 block mb-2 text-sm">Q1: Managing Daily Stress</span>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedLead?.answers?.q1 !== undefined ? answerMap.q1[selectedLead.answers.q1] : "No answer"}
                     </p>
                   </div>
 
-                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100/50 shadow-sm transition-all hover:border-green-200">
-                    <span className="font-bold text-green-900 block mb-2 text-sm">Q2: Weight Loss & Daily Energy</span>
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm transition-all hover:border-blue-200">
+                    <span className="font-bold text-blue-900 block mb-2 text-sm">Q2: Weight Loss & Daily Energy</span>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedLead?.answers?.q2 !== undefined ? answerMap.q2[selectedLead.answers.q2] : "No answer"}
                     </p>
                   </div>
 
-                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100/50 shadow-sm transition-all hover:border-green-200">
-                    <span className="font-bold text-green-900 block mb-2 text-sm">Q3: Diet & Eating Habits</span>
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm transition-all hover:border-blue-200">
+                    <span className="font-bold text-blue-900 block mb-2 text-sm">Q3: Diet & Eating Habits</span>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedLead?.answers?.q3 !== undefined ? answerMap.q3[selectedLead.answers.q3] : "No answer"}
                     </p>
                   </div>
 
-                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100/50 shadow-sm transition-all hover:border-green-200">
-                    <span className="font-bold text-green-900 block mb-2 text-sm">Q4: Exercise & Joint Health</span>
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm transition-all hover:border-blue-200">
+                    <span className="font-bold text-blue-900 block mb-2 text-sm">Q4: Exercise & Joint Health</span>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedLead?.answers?.q4 !== undefined ? answerMap.q4[selectedLead.answers.q4] : "No answer"}
                     </p>
                   </div>
 
-                  <div className="bg-green-50/50 p-4 rounded-xl border border-green-100/50 shadow-sm transition-all hover:border-green-200 md:col-span-2">
-                    <span className="font-bold text-green-900 block mb-2 text-sm">Q5: Sleep & Waking Up</span>
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm transition-all hover:border-blue-200 md:col-span-2">
+                    <span className="font-bold text-blue-900 block mb-2 text-sm">Q5: Sleep & Waking Up</span>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {selectedLead?.answers?.q5 !== undefined ? answerMap.q5[selectedLead.answers.q5] : "No answer"}
                     </p>

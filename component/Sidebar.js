@@ -17,6 +17,7 @@ import {
   MailCheck
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 
 const NavItem = ({ href, icon: Icon, label, collapsed, active = false }) => (
   <Link
@@ -26,13 +27,13 @@ const NavItem = ({ href, icon: Icon, label, collapsed, active = false }) => (
       flex items-center gap-3 px-3 py-2.5 mx-3 rounded-lg transition-all duration-200 group
       ${active 
         ? "bg-gray-50 text-gray-700 border border-gray-300" 
-        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 border border-transparent"}
+        : "text-gray-300 hover:bg-gray-50 hover:text-gray-900 border border-transparent"}
     `}
   >
     <div className="shrink-0 flex items-center justify-center">
       <Icon 
         size={20} 
-        className={active ? "text-gray-600" : "text-gray-400 group-hover:text-gray-600"} 
+        className={active ? "text-gray-600" : "text-gray-300 group-hover:text-gray-600"} 
       />
     </div>
     <span
@@ -50,7 +51,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
 
   return (
     <div
-      className={`h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)]
+      className={`h-screen bg-[#05335c] border-r border-gray-200 transition-all duration-300 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)]
       ${collapsed ? "w-20" : "w-64"}`}
     >
       {/* Header & Toggle */}
@@ -58,14 +59,12 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         {!collapsed && (
           <div className="flex items-center gap-2.5 overflow-hidden pl-2">
         
-            <span className="font-bold text-lg text-gray-900 uppercase">
-              Admin Kayapalat
-            </span>
+            <Image src={'/logok.jpg'} width={300} height={100} alt="logo" />
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-colors shrink-0"
+          className="p-2 rounded-lg text-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-colors shrink-0"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
@@ -130,7 +129,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
       </nav>
 
       {/* Footer / Profile Section */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+      <div className="p-4 border-t border-gray-100 bg-gray-50">
         <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} mb-3`}>
           {/* Avatar - Always visible */}
           <Link href="/profile" className="shrink-0">
