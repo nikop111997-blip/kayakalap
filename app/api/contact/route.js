@@ -180,7 +180,7 @@ export async function POST(req) {
     const client = await clientPromise;
     const db = client.db("kayakalap");
 
-    const result = await db.collection("bookings").insertOne({
+    const result = await db.collection("contacts").insertOne({
       name: trimmedName,
       email: trimmedEmail,
       phone: cleanedPhone,
