@@ -1,7 +1,8 @@
 import clientPromise from "@/lib/mongodb"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
-
+import { sendMail } from "@/lib/mailer";
+import { getTemplate } from "@/lib/templates";
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -199,6 +200,21 @@ export async function POST(req) {
       userAgent,
       createdAt: new Date(),
     })
+const userTemplate = getTemplate("callback", {
+  name: trimmedName,
+  email: trimmedEmail,
+  phone: cleanedPhone,
+  date,
+  goal,
+  program,
+  message,
+});
+
+sendMail({
+  to: trimmedEmail,
+  subject: userTemplate.subject,
+  html: userTemplate.html,
+});
 
     return new Response(
       JSON.stringify({
