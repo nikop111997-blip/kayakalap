@@ -52,12 +52,7 @@ sendMail({
   subject: userTpl.subject,
   html: userTpl.html,
 });
-const adminTpl = getTemplate("admin", { email });
-sendMail({
-  to: "puni199711@gmail.com",
-  subject: adminTpl.subject,
-  html: adminTpl.html,
-});
+
     return new Response(
       JSON.stringify({ success: true, message: "Subscribed successfully" }),
       {
