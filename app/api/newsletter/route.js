@@ -1,5 +1,6 @@
 import clientPromise from "@/lib/mongodb";
-
+import { sendMail } from "@/lib/mailer";
+import { getTemplate } from "@/lib/template";
 export async function POST(req) {
   try {
     const { email } = await req.json();
@@ -45,7 +46,18 @@ export async function POST(req) {
       email,
       createdAt: new Date(),
     });
-
+    const userTpl = getTemplate("newsletter", { name: email });
+sendMail({
+  to: email,
+  subject: userTpl.subject,
+  html: userTpl.html,
+});
+const adminTpl = getTemplate("admin", { email });
+sendMail({
+  to: "puni199711@gmail.com",
+  subject: adminTpl.subject,
+  html: adminTpl.html,
+});
     return new Response(
       JSON.stringify({ success: true, message: "Subscribed successfully" }),
       {
