@@ -111,34 +111,34 @@ export async function GET(req) {
 }
 export async function POST(req) {
   try {
-    // ================= CORS HEADERS =================
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
-    }
+    };
 
-    const body = await req.json()
+    const body = await req.json();
 
+    // ✅ MATCHED WITH COMPONENT
     const {
-      name,
+      fullName,
       email,
       phone,
-      date,
-      goal,
+      fitnessGoal,
       program,
-      message,
-    } = body
+      notes,
+      bookingDate,
+      bookingTime,
+    } = body;
 
-    // ================= TRIM =================
-    const trimmedName = name?.trim()
-    const trimmedEmail = email?.trim()
+    // ================= CLEAN =================
+    const trimmedName = fullName?.trim();
+    const trimmedEmail = email?.trim();
 
-    // ================= CLEAN PHONE =================
-    let cleanedPhone = phone?.replace(/\D/g, "")
+    let cleanedPhone = phone?.replace(/\D/g, "");
 
     if (cleanedPhone?.startsWith("91") && cleanedPhone.length > 10) {
-      cleanedPhone = cleanedPhone.slice(-10)
+      cleanedPhone = cleanedPhone.slice(-10);
     }
 
     // ================= VALIDATION =================
@@ -149,72 +149,68 @@ export async function POST(req) {
           error: "Name, Email, and Phone are required.",
         }),
         { status: 400, headers: corsHeaders }
-      )
+      );
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Invalid email format.",
-        }),
+        JSON.stringify({ success: false, error: "Invalid email format." }),
         { status: 400, headers: corsHeaders }
-      )
+      );
     }
 
-    // Phone validation (Indian)
-    const phoneRegex = /^[6-9]\d{9}$/
+    const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(cleanedPhone)) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Invalid mobile number.",
-        }),
+        JSON.stringify({ success: false, error: "Invalid mobile number." }),
         { status: 400, headers: corsHeaders }
-      )
+      );
     }
 
-    // ================= GET IP =================
-    const forwarded = req.headers.get("x-forwarded-for")
+    // ================= META =================
+    const forwarded = req.headers.get("x-forwarded-for");
     const ip = forwarded
       ? forwarded.split(",")[0]
-      : req.headers.get("x-real-ip") || "Unknown"
+      : req.headers.get("x-real-ip") || "Unknown";
 
-    const userAgent = req.headers.get("user-agent") || "Unknown"
+    const userAgent = req.headers.get("user-agent") || "Unknown";
 
     // ================= SAVE =================
-    const client = await clientPromise
-    const db = client.db("kayakalap")
+    const client = await clientPromise;
+    const db = client.db("kayakalap");
 
-    const result = await db.collection("contacts").insertOne({
+    const result = await db.collection("bookings").insertOne({
       name: trimmedName,
       email: trimmedEmail,
       phone: cleanedPhone,
-      date: date || null,
-      goal: goal || null,
+      goal: fitnessGoal || null,
       program: program || null,
-      message: message || null,
+      message: notes || null,
+      bookingDate: bookingDate || null,
+      bookingTime: bookingTime || null,
       ip,
       userAgent,
       createdAt: new Date(),
-    })
-const userTemplate = getTemplate("callback", {
-  name: trimmedName,
-  email: trimmedEmail,
-  phone: cleanedPhone,
-  date,
-  goal,
-  program,
-  message,
-});
+    });
 
-sendMail({
-  to: trimmedEmail,
-  subject: userTemplate.subject,
-  html: userTemplate.html,
-});
+    // ================= EMAIL =================
+    const userTemplate = getTemplate("callback", {
+      name: trimmedName,
+      email: trimmedEmail,
+      phone: cleanedPhone,
+      goal: fitnessGoal,
+      program,
+      message: notes,
+      bookingDate,
+      bookingTime,
+    });
+
+    await sendMail({
+      to: trimmedEmail,
+      subject: userTemplate.subject,
+      html: userTemplate.html,
+    });
 
     return new Response(
       JSON.stringify({
@@ -222,8 +218,7 @@ sendMail({
         insertedId: result.insertedId,
       }),
       { status: 201, headers: corsHeaders }
-    )
-
+    );
   } catch (error) {
     return new Response(
       JSON.stringify({
@@ -236,7 +231,7 @@ sendMail({
           "Access-Control-Allow-Origin": "*",
         },
       }
-    )
+    );
   }
 }
 
