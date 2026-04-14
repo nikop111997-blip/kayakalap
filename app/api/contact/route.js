@@ -2,7 +2,7 @@ import clientPromise from "@/lib/mongodb"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
 import { sendMail } from "@/lib/mailer";
-import { getTemplate } from "@/lib/templates";
+import { getTemplate } from "@/lib/template";
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
