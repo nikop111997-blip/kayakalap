@@ -1,33 +1,42 @@
-import clientPromise from "@/lib/mongodb"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/authOptions"
-import { sendMail } from "@/lib/mailer";
-import { getTemplate } from "@/lib/template";
+import clientPromise from "@/lib/mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+
+// ✅ Universal CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // 🔥 change to your domain if using cookies
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "*",
+};
+
+// ================= GET =================
 export async function GET(req) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== "admin") {
-      return Response.json({ unauthorized: true })
+      return new Response(
+        JSON.stringify({ unauthorized: true }),
+        { status: 401, headers: corsHeaders }
+      );
     }
 
-    const { searchParams } = new URL(req.url)
+    const { searchParams } = new URL(req.url);
 
-    const page = parseInt(searchParams.get("page")) || 1
-    const limit = parseInt(searchParams.get("limit")) || 20
-    const search = searchParams.get("search") || ""
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 20;
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort");
+    const fromDate = searchParams.get("fromDate");
+    const toDate = searchParams.get("toDate");
+    const dateFilter = searchParams.get("dateFilter");
 
-    const sort = searchParams.get("sort")
-    const fromDate = searchParams.get("fromDate")
-    const toDate = searchParams.get("toDate")
-    const dateFilter = searchParams.get("dateFilter")
+    const skip = (page - 1) * limit;
 
-    const skip = (page - 1) * limit
+    const client = await clientPromise;
+    const db = client.db("kayakalap");
 
-    const client = await clientPromise
-    const db = client.db("kayakalap")
-
-    let query = {}
+    let query = {};
 
     // 🔍 Search
     if (search) {
@@ -35,94 +44,69 @@ export async function GET(req) {
         { name: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
         { phone: { $regex: search, $options: "i" } },
-        { ip: { $regex: search, $options: "i" } }
-      ]
+        { ip: { $regex: search, $options: "i" } },
+      ];
     }
 
-    // 🎯 Filters
-    if (status) query.status = status
-    if (goal) query.goal = goal
-    if (program) query.program = program
-
-    // 📅 Date Handling (PRIORITY LOGIC)
-
-    // 👉 Custom date range (highest priority)
+    // 📅 Date Filter
     if (fromDate || toDate) {
-      query.createdAt = {}
-
-      if (fromDate) {
-        query.createdAt.$gte = new Date(fromDate)
-      }
+      query.createdAt = {};
+      if (fromDate) query.createdAt.$gte = new Date(fromDate);
 
       if (toDate) {
-        const to = new Date(toDate)
-        to.setHours(23, 59, 59, 999)
-        query.createdAt.$lte = to
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = to;
       }
-    }
+    } else if (dateFilter && dateFilter !== "All") {
+      const now = new Date();
+      let from = new Date();
 
-    // 👉 Quick filters (only if no custom date)
-    else if (dateFilter && dateFilter !== "All") {
-      const now = new Date()
-      let from = new Date()
+      if (dateFilter === "Today") from.setHours(0, 0, 0, 0);
+      if (dateFilter === "Last3") from.setDate(now.getDate() - 3);
+      if (dateFilter === "Last7") from.setDate(now.getDate() - 7);
+      if (dateFilter === "Last30") from.setDate(now.getDate() - 30);
 
-      if (dateFilter === "Today") {
-        from.setHours(0, 0, 0, 0)
-      } else if (dateFilter === "Last3") {
-        from.setDate(now.getDate() - 3)
-      } else if (dateFilter === "Last7") {
-        from.setDate(now.getDate() - 7)
-      } else if (dateFilter === "Last30") {
-        from.setDate(now.getDate() - 30)
-      }
-
-      query.createdAt = { $gte: from }
+      query.createdAt = { $gte: from };
     }
 
     // 🔽 Sorting
-    let sortOption = { createdAt: -1 }
-
-    if (sort === "oldest") sortOption = { createdAt: 1 }
-    if (sort === "name") sortOption = { name: 1 }
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    if (sort === "name") sortOption = { name: 1 };
 
     const contacts = await db
       .collection("popup")
       .find(query)
-      .sort(sortOption) // ✅ FIXED
+      .sort(sortOption)
       .skip(skip)
       .limit(limit)
-      .toArray()
+      .toArray();
 
-    const total = await db.collection("popup").countDocuments(query)
+    const total = await db.collection("popup").countDocuments(query);
 
-    return Response.json({
-      data: contacts,
-      pages: Math.ceil(total / limit)
-    })
-
+    return new Response(
+      JSON.stringify({
+        data: contacts,
+        pages: Math.ceil(total / limit),
+      }),
+      { status: 200, headers: corsHeaders }
+    );
   } catch (error) {
-    console.error(error)
-    return Response.json({ error: true })
+    return new Response(
+      JSON.stringify({ error: true }),
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
+
+// ================= POST =================
 export async function POST(req) {
   try {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    };
-
     const body = await req.json();
 
-    // ✅ MATCHED WITH COMPONENT
-    const {
-      name,
-      email,
-      phone,
-    } = body;
+    const { name, email, phone } = body;
 
-    // ================= CLEAN =================
     const trimmedName = name?.trim();
     const trimmedEmail = email?.trim();
 
@@ -132,7 +116,7 @@ export async function POST(req) {
       cleanedPhone = cleanedPhone.slice(-10);
     }
 
-    // ================= VALIDATION =================
+    // ✅ Validation
     if (!trimmedName || !trimmedEmail || !cleanedPhone) {
       return new Response(
         JSON.stringify({
@@ -159,14 +143,6 @@ export async function POST(req) {
       );
     }
 
-    // ================= META =================
-    const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded
-      ? forwarded.split(",")[0]
-      : req.headers.get("x-real-ip") || "Unknown";
-
-    const userAgent = req.headers.get("user-agent") || "Unknown";
-
     // ================= SAVE =================
     const client = await clientPromise;
     const db = client.db("kayakalap");
@@ -175,8 +151,6 @@ export async function POST(req) {
       name: trimmedName,
       email: trimmedEmail,
       phone: cleanedPhone,
-      ip,
-      userAgent,
       createdAt: new Date(),
     });
 
@@ -191,26 +165,17 @@ export async function POST(req) {
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Server error. Please try again later.",
+        error: "Server error",
       }),
-      {
-        status: 500,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
-// ✅ Handle preflight request (VERY IMPORTANT for CORS)
+// ================= OPTIONS (CORS PREFLIGHT) =================
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
-  })
+    headers: corsHeaders,
+  });
 }
