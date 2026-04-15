@@ -15,7 +15,8 @@ import {
   LogOutIcon,
   FileQuestion,
   MailCheck,
-  UserCheck
+  UserCheck,
+  UserCircle
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -88,6 +89,15 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             label="Leads" 
             collapsed={collapsed} 
             active={pathname.includes("/leads")}
+          />
+        )}
+        {session?.user?.role === 'admin' && (
+          <NavItem 
+            href="/enquiry" 
+            icon={UserCircle} 
+            label="Enquiry" 
+            collapsed={collapsed} 
+            active={pathname.includes("/enquiry")}
           />
         )}
         {/* <NavItem 

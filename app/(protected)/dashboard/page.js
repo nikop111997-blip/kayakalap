@@ -97,7 +97,7 @@ const [range, setRange] = useState("monthly")
         <div className="xl:col-span-2 space-y-6">
           
           {/* 2x2 Stats Grid mapping to your total counts */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-3 gap-6">
             <StatCard 
   title="Total Leads"
   value={data.cards.totalLeads}
@@ -118,7 +118,12 @@ const [range, setRange] = useState("monthly")
   trend={data.trends.quiz.value}
   isPositive={data.trends.quiz.positive}
 />
-
+<StatCard 
+  title="Enquiry"
+  value={data.cards.totalEnuiry}
+  trend={data.trends.enquiry.value}
+  isPositive={data.trends.enquiry.positive}
+/>
 <StatCard 
   title="Newsletter"
   value={data.cards.totalNewsletter}

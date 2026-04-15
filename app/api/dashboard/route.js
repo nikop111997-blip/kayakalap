@@ -23,7 +23,7 @@ export async function GET(req) {
     const contactsCol = db.collection("contacts")
     const quizCol = db.collection("leads")
     const newsletterCol = db.collection("newsletter")
-
+    const enquirCol = db.collection("popup")
     // ======================
     // 📅 DATE SETUP
     // ======================
@@ -68,8 +68,8 @@ export async function GET(req) {
     const totalContacts = await contactsCol.countDocuments()
     const totalQuiz = await quizCol.countDocuments()
     const totalNewsletter = await newsletterCol.countDocuments()
-
-    const totalLeads = totalContacts + totalQuiz + totalNewsletter
+    const totalEnuiry = await enquirCol.countDocuments()
+    const totalLeads = totalContacts + totalQuiz + totalNewsletter +totalEnuiry
 
     // ======================
     // 📈 TREND CALCULATION (LAST 30 DAYS)
@@ -95,6 +95,14 @@ export async function GET(req) {
     })
 
     const previousNewsletter = await newsletterCol.countDocuments({
+      createdAt: { $gte: prev30Days, $lt: last30Days }
+    })
+
+    const currentEnquiry = await enquirCol.countDocuments({
+      createdAt: { $gte: last30Days }
+    })
+
+    const previousEnquiry = await enquirCol.countDocuments({
       createdAt: { $gte: prev30Days, $lt: last30Days }
     })
 
@@ -198,7 +206,8 @@ export async function GET(req) {
         totalLeads,
         totalContacts,
         totalQuiz,
-        totalNewsletter
+        totalNewsletter,
+        totalEnuiry
       },
 
       trends: {
@@ -208,7 +217,8 @@ export async function GET(req) {
         ),
         contacts: calculateTrend(currentContacts, previousContacts),
         quiz: calculateTrend(currentQuiz, previousQuiz),
-        newsletter: calculateTrend(currentNewsletter, previousNewsletter)
+        newsletter: calculateTrend(currentNewsletter, previousNewsletter),
+        enquiry : calculateTrend(currentEnquiry, previousEnquiry)
       },
 
       statusStats,
