@@ -375,7 +375,7 @@ const [toDate, setToDate] = useState("")
                 <tr>
                   <th className="px-6 py-4">Name & Contact</th>
                   <th className="px-6 py-4">Program & Goal</th>
-                  <th className="px-6 py-4">Date Created</th>
+                  <th className="px-6 py-4">Call Time Prefrence</th>
                   <th className="px-6 py-4">Status</th>
                 </tr>
               </thead>
@@ -415,9 +415,9 @@ const [toDate, setToDate] = useState("")
                   // Data Rows
                   leads.map((lead) => {
                     const leadId = getLeadId(lead);
-                    const parsedDate = typeof lead.createdAt === 'object' && lead.createdAt !== null 
-                                       ? new Date(lead.createdAt.$date) 
-                                       : new Date(lead.createdAt);
+                    const parsedDate = typeof lead.bookingDate === 'object' && lead.bookingDate !== null 
+                                       ? new Date(lead.bookingDate.$date) 
+                                       : new Date(lead.bookingDate);
 
                     return (
                       <tr 
@@ -436,7 +436,7 @@ const [toDate, setToDate] = useState("")
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-gray-900">{parsedDate.toLocaleDateString()}</div>
-                          <div className="text-gray-500 text-xs mt-1">{parsedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                          <div className="text-gray-500 text-xs mt-1">{lead.bookingTime}</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status || "New")}`}>
