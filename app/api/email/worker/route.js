@@ -27,16 +27,26 @@ export async function GET() {
 
     console.log("Processing:", email);
 
-    const campaign = await db.collection("campaigns").findOne({
-      _id: new ObjectId(campaignId),
-    });
-
-    const template = await db.collection("email_templates").findOne({
-      _id: new ObjectId(campaign.templateId),
-    });
-
     try {
-      // ✅ build html
+      const campaign = await db.collection("campaigns").findOne({
+        _id: new ObjectId(campaignId),
+      });
+
+      if (!campaign) {
+        console.error("❌ Campaign not found:", campaignId);
+        continue;
+      }
+
+      const template = await db.collection("email_templates").findOne({
+        _id: new ObjectId(campaign.templateId),
+      });
+
+      if (!template) {
+        console.error("❌ Template not found:", campaign.templateId);
+        continue;
+      }
+
+      // ✅ build HTML
       let html = buildEmailHtml(
         template.compiledHtml,
         template.compiledCss
@@ -45,19 +55,20 @@ export async function GET() {
       // ✅ click tracking
       html = addClickTracking(html, campaignId, email);
 
-      // ✅ open tracking (ONLY ONCE)
-      const trackingPixel = `<img src="https://kayakalap.vercel.app/api/email/open/${campaignId}/${encodeURIComponent(email)}" width="1" height="1" style="display:none;" />`;
+      // ✅ open tracking (with cache-busting)
+      const trackingPixel = `<img src="https://kayakalap.vercel.app/api/email/open/${campaignId}/${encodeURIComponent(email)}?t=${Date.now()}" width="1" height="1" style="display:none;" />`;
 
-      const finalHtml = html + trackingPixel;
+      // ✅ inject pixel properly
+      html = html.replace("</body>", trackingPixel + "</body>");
 
-      // ✅ CORRECT PARAM
+      // ✅ send email
       await sendEmail({
         to: email,
         subject: campaign.subject,
-        html: finalHtml,
+        html,
       });
 
-      console.log("Email sent:", email);
+      console.log("✅ Email sent:", email);
 
       await db.collection("email_logs").updateOne(
         { campaignId, email },
@@ -71,14 +82,24 @@ export async function GET() {
 
       processed++;
 
+      // ⚠️ delay to avoid Gmail blocking
+      await new Promise((r) => setTimeout(r, 200));
+
     } catch (err) {
-      console.error("Email failed:", email, err);
+      console.error("❌ Email failed:", email, err);
 
       await db.collection("email_logs").updateOne(
         { campaignId, email },
         { $set: { status: "failed" } }
       );
     }
+  }
+
+  // 🔥 AUTO-CONTINUE (IMPORTANT FOR VERCEL)
+  if (processed > 0) {
+    setTimeout(() => {
+      fetch("https://kayakalap.vercel.app/api/email/worker");
+    }, 1000);
   }
 
   return Response.json({ processed });

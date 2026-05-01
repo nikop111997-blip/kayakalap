@@ -1,6 +1,5 @@
 import clientPromise from "@/lib/mongodb";
 import { redis } from "@/lib/upstash";
-import { ObjectId } from "mongodb";
 
 export async function POST(req) {
   try {
@@ -11,6 +10,7 @@ export async function POST(req) {
 
     let users = [];
 
+    // ✅ audience filter
     if (body.audience === "all") {
       users = await db.collection("newsletter").find().toArray();
     }
@@ -33,38 +33,53 @@ export async function POST(req) {
       }).toArray();
     }
 
+    // ⚠️ remove duplicate emails
+    const uniqueEmails = [...new Set(users.map(u => u.email))];
+
+    // ✅ create campaign
     const campaign = await db.collection("campaigns").insertOne({
       title: body.title,
       subject: body.subject,
       templateId: body.templateId,
       audience: body.audience,
       status: "queued",
-      total: users.length,
+      total: uniqueEmails.length,
       sent: 0,
       createdAt: new Date(),
     });
 
-    const logs = users.map(u => ({
+    // ✅ create logs
+    const logs = uniqueEmails.map(email => ({
       campaignId: campaign.insertedId.toString(),
-      email: u.email,
+      email,
       status: "pending",
       opened: false,
       clicked: false,
+      retryCount: 0,
     }));
 
     if (logs.length > 0) {
       await db.collection("email_logs").insertMany(logs);
     }
 
-    // ✅ NEW QUEUE (Upstash)
-    for (const user of users) {
-      await redis.lpush("email_queue", JSON.stringify({
-        campaignId: campaign.insertedId.toString(),
-        email: user.email,
-      }));
+    // 🚀 PUSH TO QUEUE (BATCH — FAST)
+    const queueData = uniqueEmails.map(email => ({
+      campaignId: campaign.insertedId.toString(),
+      email,
+    }));
+
+    // push all at once
+    await redis.lpush("email_queue", ...queueData);
+
+    // 🔥 TRIGGER WORKER (IMPORTANT)
+    for (let i = 0; i < 5; i++) {
+      fetch("https://kayakalap.vercel.app/api/email/worker");
     }
 
-    return Response.json({ success: true });
+    return Response.json({
+      success: true,
+      total: uniqueEmails.length,
+    });
 
   } catch (err) {
     console.error(err);
