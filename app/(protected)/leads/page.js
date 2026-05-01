@@ -3,7 +3,10 @@ import React, { useState, useMemo, useEffect } from "react";
 import { 
   Search, Filter, Plus, Upload, X, MessageSquare, 
   Calendar, User, Phone, Mail, ChevronRight, CheckCircle, 
-  XCircle, Clock, AlertCircle, ArrowDownToLine, Target, Award
+  XCircle, Clock, AlertCircle, ArrowDownToLine, Target, Award,
+  TargetIcon,
+  Activity,
+  Globe
 } from "lucide-react";
 
 // --- CUSTOM HOOKS ---
@@ -76,7 +79,7 @@ const [toDate, setToDate] = useState("")
   const [goalFilter, setGoalFilter] = useState("All");
   const [programFilter, setProgramFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("All"); // All, Today, Last3, Last7, Last30
-  const limit = 20;
+  const limit = 10;
 
   // Reset page when filters change
   useEffect(() => {
@@ -375,6 +378,7 @@ const [toDate, setToDate] = useState("")
                 <tr>
                   <th className="px-6 py-4">Name & Contact</th>
                   <th className="px-6 py-4">Program & Goal</th>
+                  <th className="px-6 py-4">Lead Source</th>
                   <th className="px-6 py-4">Call Time Prefrence</th>
                   <th className="px-6 py-4">Status</th>
                 </tr>
@@ -433,6 +437,10 @@ const [toDate, setToDate] = useState("")
                         <td className="px-6 py-4">
                           <div className="font-medium text-gray-900">{lead.program}</div>
                           <div className="text-gray-500 text-xs mt-1 truncate max-w-[200px]">{lead.goal}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-gray-900">{lead.source?.charAt(0).toUpperCase() + lead.source?.slice(1)}</div>
+                          <div className="text-gray-500 text-xs mt-1">{lead.medium} - {lead.campaign}</div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-gray-900">{parsedDate.toLocaleDateString()}</div>
@@ -516,7 +524,7 @@ const [toDate, setToDate] = useState("")
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar size={16} className="mr-3 text-gray-400" />
-                    <span>Booking Date: <span className="font-medium text-gray-900">{selectedLead.date}</span></span>
+                    <span>Created Date: <span className="font-medium text-gray-700">{selectedLead.createdAt && new Date(selectedLead.createdAt).toLocaleDateString()}</span></span>
                   </div>
                   {selectedLead.referredBy && (
                     <div className="flex items-center text-sm text-gray-600">
@@ -528,6 +536,46 @@ const [toDate, setToDate] = useState("")
               </div>
 
               <hr className="border-gray-100" />
+                  <div className="flex items-center text-sm text-gray-600">
+    <Globe size={16} className="mr-3 text-gray-400" />
+    <span>
+      Source:{" "}
+      <span className="font-medium text-gray-900">
+        {selectedLead.source
+          ? selectedLead.source.charAt(0).toUpperCase() +
+            selectedLead.source.slice(1)
+          : "Direct"}
+      </span>
+    </span>
+  </div>
+
+  {/* MEDIUM */}
+  <div className="flex items-center text-sm text-gray-600">
+    <Activity size={16} className="mr-3 text-gray-400" />
+    <span>
+      Medium:{" "}
+      <span className="font-medium text-gray-900">
+        {selectedLead.medium
+          ? selectedLead.medium.charAt(0).toUpperCase() +
+            selectedLead.medium.slice(1)
+          : "Website"}
+      </span>
+    </span>
+  </div>
+
+  {/* CAMPAIGN */}
+  <div className="flex items-center text-sm text-gray-600">
+    <TargetIcon size={16} className="mr-3 text-gray-400" />
+    <span>
+      Campaign:{" "}
+      <span className="font-medium text-gray-900">
+        {selectedLead.campaign
+          ? selectedLead.campaign.charAt(0).toUpperCase() +
+            selectedLead.campaign.slice(1)
+          : "Default"}
+      </span>
+    </span>
+  </div>
 
               {/* Status Update */}
               <div>

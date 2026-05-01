@@ -137,7 +137,9 @@ function CampaignForm() {
       },
       body: JSON.stringify(formData),
     });
-
+for (let i = 0; i < 10; i++) {
+  fetch("/api/email/worker");
+}
     setSuccessMessage("Campaign started 🚀");
 
   } catch (err) {

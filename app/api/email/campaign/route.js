@@ -1,3 +1,5 @@
+// /app/api/email/campaign/route.js
+
 import clientPromise from "@/lib/mongodb";
 import { redis } from "@/lib/upstash";
 
@@ -10,7 +12,6 @@ export async function POST(req) {
 
     let users = [];
 
-    // ✅ audience filter
     if (body.audience === "all") {
       users = await db.collection("newsletter").find().toArray();
     }
@@ -33,10 +34,9 @@ export async function POST(req) {
       }).toArray();
     }
 
-    // ⚠️ remove duplicate emails
+    // remove duplicates
     const uniqueEmails = [...new Set(users.map(u => u.email))];
 
-    // ✅ create campaign
     const campaign = await db.collection("campaigns").insertOne({
       title: body.title,
       subject: body.subject,
@@ -48,7 +48,7 @@ export async function POST(req) {
       createdAt: new Date(),
     });
 
-    // ✅ create logs
+    // logs
     const logs = uniqueEmails.map(email => ({
       campaignId: campaign.insertedId.toString(),
       email,
@@ -62,19 +62,16 @@ export async function POST(req) {
       await db.collection("email_logs").insertMany(logs);
     }
 
-    // 🚀 PUSH TO QUEUE (BATCH — FAST)
-    const queueData = uniqueEmails.map(email => ({
-      campaignId: campaign.insertedId.toString(),
-      email,
-    }));
-
-    // push all at once
-    await redis.lpush("email_queue", ...queueData);
-
-    // 🔥 TRIGGER WORKER (IMPORTANT)
-    for (let i = 0; i < 5; i++) {
-      fetch("https://kayakalap.vercel.app/api/email/worker");
-    }
+    // 🚀 push to queue (STRING SAFE)
+    await redis.lpush(
+      "email_queue",
+      ...uniqueEmails.map(email =>
+        JSON.stringify({
+          campaignId: campaign.insertedId.toString(),
+          email,
+        })
+      )
+    );
 
     return Response.json({
       success: true,

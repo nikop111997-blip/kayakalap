@@ -17,7 +17,8 @@ import {
   MailCheck,
   UserCheck,
   UserCircle,
-  MailIcon
+  MailIcon,
+  ListChecks
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -124,10 +125,17 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         /> 
         <NavItem 
           href="/newsletter" 
-          icon={MailCheck} 
+          icon={ListChecks} 
           label="Subscribers" 
           collapsed={collapsed} 
           active={pathname.includes("/newsletter")} 
+        />
+        <NavItem 
+          href="/campaign" // Update these paths to match your actual routing
+          icon={MailCheck} 
+          label="Email Campaigns" 
+          collapsed={collapsed} 
+          active={pathname === "/campaign"}
         />
         <NavItem 
           href="/email/template" // Update these paths to match your actual routing

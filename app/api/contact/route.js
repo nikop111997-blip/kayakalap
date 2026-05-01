@@ -89,14 +89,19 @@ export async function GET(req) {
     if (sort === "oldest") sortOption = { createdAt: 1 }
     if (sort === "name") sortOption = { name: 1 }
 
-    const contacts = await db
+    const contactsRaw  = await db
       .collection("contacts")
       .find(query)
       .sort(sortOption) // ✅ FIXED
       .skip(skip)
       .limit(limit)
       .toArray()
-
+const contacts = contactsRaw.map((item) => ({
+  ...item,
+  source: item.source || "direct",
+  medium: item.medium || "website",
+  campaign: item.campaign || "default",
+}))
     const total = await db.collection("contacts").countDocuments(query)
 
     return Response.json({
@@ -121,15 +126,20 @@ export async function POST(req) {
 
     // ✅ MATCHED WITH COMPONENT
     const {
-      fullName,
-      email,
-      phone,
-      fitnessGoal,
-      program,
-      notes,
-      bookingDate,
-      bookingTime,
-    } = body;
+  fullName,
+  email,
+  phone,
+  fitnessGoal,
+  program,
+  notes,
+  bookingDate,
+  bookingTime,
+
+  // 🔥 NEW FIELDS FROM FRONTEND
+  source,
+  medium,
+  campaign,
+} = body;
 
     // ================= CLEAN =================
     const trimmedName = fullName?.trim();
@@ -189,6 +199,9 @@ export async function POST(req) {
       message: notes || null,
       bookingDate: bookingDate || null,
       bookingTime: bookingTime || null,
+      source: source || null,
+      medium: medium || null,
+      campaign: campaign || null,
       ip,
       userAgent,
       createdAt: new Date(),
