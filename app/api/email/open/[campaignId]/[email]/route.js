@@ -4,7 +4,7 @@ export async function GET(req, { params }) {
   const { campaignId, email } = params;
 
   const client = await clientPromise;
-  const db = client.db("kayakalap");
+  const db = client.db("kayakalap"); 
 
   await db.collection("email_logs").updateOne(
     { campaignId, email },
