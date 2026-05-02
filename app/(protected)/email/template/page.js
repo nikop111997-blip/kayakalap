@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { 
   Search, Filter, X, 
   AlertCircle, Eye, Send, Edit, Trash2,
-  Monitor, Smartphone
+  Monitor, Smartphone,
+  PlusCircle
 } from "lucide-react";
 import Link from "next/link";
 
@@ -170,6 +171,13 @@ export default function App() {
           <h1 className="text-2xl font-bold text-gray-900">Email Templates</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your email templates.</p>
         </div>
+        <Link
+          href="/email/template/create"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
+        >
+          <PlusCircle size={18} />
+          New Template
+        </Link>
       </header>
 
       {/* Filters Bar */}

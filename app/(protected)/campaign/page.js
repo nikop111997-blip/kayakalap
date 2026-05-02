@@ -155,7 +155,7 @@ const [toDate, setToDate] = useState("")
   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
 >
   <Plus size={18} />
-  Add Lead
+  New Campaign
 </Link>
  <Link
   href="/mail-logs"
