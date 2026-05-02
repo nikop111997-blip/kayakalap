@@ -56,7 +56,11 @@ export async function GET() {
       // open tracking
       const pixel = `<img src="${BASE_URL}/api/email/open/${campaignId}/${encodeURIComponent(email)}?t=${Date.now()}" width="1" height="1" style="display:none;" />`;
 
-      html = html.replace("</body>", pixel + "</body>");
+      if (html.includes("</body>")) {
+  html = html.replace("</body>", pixel + "</body>");
+} else {
+  html += pixel;
+}
 
       // send email
       await sendEmail({

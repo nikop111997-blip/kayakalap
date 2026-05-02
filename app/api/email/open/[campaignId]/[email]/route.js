@@ -2,7 +2,7 @@ import clientPromise from "@/lib/mongodb";
 
 export async function GET(req, { params }) {
   try {
-    const { campaignId, email } = params;
+    const { campaignId, email } = await params;
 
     // ✅ decode email
     const decodedEmail = decodeURIComponent(email);
