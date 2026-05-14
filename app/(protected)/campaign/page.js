@@ -152,14 +152,14 @@ const [toDate, setToDate] = useState("")
         <div className="flex gap-2">
      <Link
   href="/send-mail"
-  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
+  className="flex items-center gap-2 px-4 py-2 bg-[#05335c] text-white rounded-lg hover:bg-blue-900 font-medium transition-colors shadow-sm"
 >
   <Plus size={18} />
   New Campaign
 </Link>
  <Link
   href="/mail-logs"
-  className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-blue-600 rounded-lg hover:bg-blue-100 font-medium transition-colors shadow-sm"
+  className="flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-[#05335c] rounded-lg hover:bg-blue-100 font-medium transition-colors shadow-sm"
 >
   <ListChecks size={18} />
   Email Logs

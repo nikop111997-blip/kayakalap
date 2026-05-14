@@ -34,7 +34,7 @@ export default function EditBlogPage() {
 
       if (blogRes.error) {
         toast.error(blogRes.error)
-        router.push("/dashboard/blogs")
+        router.push("/blogs")
         return
       }
 console.log(blogRes)
@@ -68,7 +68,7 @@ console.log(blogRes)
     }
 
     toast.success("Blog updated successfully")
-    router.push("/dashboard/blogs")
+    router.push("/blogs")
   }
 
   if (unauthorized) return <AccessDenied />

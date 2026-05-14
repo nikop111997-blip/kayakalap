@@ -10,33 +10,59 @@ export async function POST(req) {
     const client = await clientPromise;
     const db = client.db("kayakalap");
 
-    let users = [];
+    let uniqueEmails = [];
 
+    // 🎯 AUDIENCE LOGIC
     if (body.audience === "all") {
-      users = await db.collection("newsletter").find().toArray();
+      const users = await db.collection("newsletter").find().toArray();
+      uniqueEmails = [...new Set(users.map((u) => u.email))];
     }
 
-    if (body.audience === "last_7_days") {
+    else if (body.audience === "last_7_days") {
       const date = new Date();
       date.setDate(date.getDate() - 7);
 
-      users = await db.collection("newsletter").find({
+      const users = await db.collection("newsletter").find({
         createdAt: { $gte: date },
       }).toArray();
+
+      uniqueEmails = [...new Set(users.map((u) => u.email))];
     }
 
-    if (body.audience === "last_30_days") {
+    else if (body.audience === "last_30_days") {
       const date = new Date();
       date.setDate(date.getDate() - 30);
 
-      users = await db.collection("newsletter").find({
+      const users = await db.collection("newsletter").find({
         createdAt: { $gte: date },
       }).toArray();
+
+      uniqueEmails = [...new Set(users.map((u) => u.email))];
     }
 
-    // remove duplicates
-    const uniqueEmails = [...new Set(users.map(u => u.email))];
+    else if (body.audience === "opened_mail") {
+      // 🔥 get users who opened emails
+      const query = { opened: true };
 
+      // optional: filter by previous campaign
+      if (body.previousCampaignId) {
+        query.campaignId = body.previousCampaignId;
+      }
+
+      const openedLogs = await db.collection("email_logs").find(query).toArray();
+
+      uniqueEmails = [...new Set(openedLogs.map((log) => log.email))];
+    }
+
+    // 🚫 no users found
+    if (uniqueEmails.length === 0) {
+      return Response.json({
+        success: false,
+        message: "No users found for selected audience",
+      });
+    }
+
+    // 📝 CREATE CAMPAIGN
     const campaign = await db.collection("campaigns").insertOne({
       title: body.title,
       subject: body.subject,
@@ -48,26 +74,29 @@ export async function POST(req) {
       createdAt: new Date(),
     });
 
-    // logs
-    const logs = uniqueEmails.map(email => ({
-      campaignId: campaign.insertedId.toString(),
+    const campaignId = campaign.insertedId.toString();
+
+    // 📊 CREATE EMAIL LOGS
+    const logs = uniqueEmails.map((email) => ({
+      campaignId,
       email,
       status: "pending",
       opened: false,
       clicked: false,
       retryCount: 0,
+      createdAt: new Date(),
     }));
 
     if (logs.length > 0) {
       await db.collection("email_logs").insertMany(logs);
     }
 
-    // 🚀 push to queue (STRING SAFE)
+    // 🚀 PUSH TO REDIS QUEUE
     await redis.lpush(
       "email_queue",
-      ...uniqueEmails.map(email =>
+      ...uniqueEmails.map((email) =>
         JSON.stringify({
-          campaignId: campaign.insertedId.toString(),
+          campaignId,
           email,
         })
       )
@@ -79,7 +108,11 @@ export async function POST(req) {
     });
 
   } catch (err) {
-    console.error(err);
-    return Response.json({ error: "Failed" }, { status: 500 });
+    console.error("Campaign Error:", err);
+
+    return Response.json(
+      { success: false, error: "Failed to create campaign" },
+      { status: 500 }
+    );
   }
 }

@@ -153,10 +153,10 @@ for (let i = 0; i < 10; i++) {
   const selectedTemplate = templates.find(t => t._id === formData.templateId);
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <div className=" py-8 px-4 sm:px-6">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Send className="text-blue-600" /> New Email Campaign
+          <Send className="text-[#05335c]" /> New Email Campaign
         </h1>
         <p className="text-sm text-gray-500 mt-1">Configure and send an email to your customer list.</p>
       </div>
@@ -240,6 +240,7 @@ for (let i = 0; i < 10; i++) {
                   <option value="all">All Subscribers</option>
                   <option value="last_7_days">New Subscribers (Last 7 Days)</option>
                   <option value="last_30_days">New Subscribers (Last 30 Days)</option>
+                  <option value="opened_mail">Opened A Mail</option>
                 </select>
               </div>
             </div>

@@ -102,20 +102,13 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             active={pathname.includes("/enquiry")}
           />
         )}
-        {/* <NavItem 
-          href="/admin/blogs" 
+        <NavItem 
+          href="/blogs" 
           icon={File} 
           label="Blogs" 
           collapsed={collapsed} 
-          active={pathname.includes("/admin/blogs")}
+          active={pathname.includes("/blogs")}
         /> 
-        <NavItem 
-          href="/admin/categories" 
-          icon={FileText} 
-          label="Categories" 
-          collapsed={collapsed} 
-          active={pathname.includes("/admin/categories")}
-        />*/}
         <NavItem 
           href="/calculator" 
           icon={FileQuestion} 
