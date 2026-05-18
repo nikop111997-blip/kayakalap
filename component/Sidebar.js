@@ -95,6 +95,15 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         )}
         {session?.user?.role === 'admin' && (
           <NavItem 
+            href="/lead-ad" 
+            icon={User2} 
+            label="Ads Lead" 
+            collapsed={collapsed} 
+            active={pathname.includes("/lead-ad")}
+          />
+        )}
+        {session?.user?.role === 'admin' && (
+          <NavItem 
             href="/enquiry" 
             icon={UserCircle} 
             label="Enquiry" 
