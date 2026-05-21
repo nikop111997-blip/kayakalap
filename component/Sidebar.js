@@ -97,7 +97,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           <NavItem 
             href="/lead-ad" 
             icon={User2} 
-            label="Ads Lead" 
+            label="Landing Page Lead" 
             collapsed={collapsed} 
             active={pathname.includes("/lead-ad")}
           />
@@ -106,7 +106,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           <NavItem 
             href="/enquiry" 
             icon={UserCircle} 
-            label="Enquiry" 
+            label="Contact From Lead" 
             collapsed={collapsed} 
             active={pathname.includes("/enquiry")}
           />

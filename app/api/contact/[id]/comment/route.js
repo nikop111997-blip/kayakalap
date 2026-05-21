@@ -19,7 +19,7 @@ export async function POST(req, { params }) {
     }
 
     // ================= PARAMS =================
-    const { id } = params;
+    const { id } = await params;
 
     const body = await req.json();
 
@@ -76,7 +76,7 @@ export async function POST(req, { params }) {
     };
 
     // ================= UPDATE =================
-    const result = await db.collection("lead_ad").updateOne(
+    const result = await db.collection("contacts").updateOne(
       {
         _id: new ObjectId(id),
       },
