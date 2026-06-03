@@ -8,7 +8,7 @@ export default function DataTable({
   renderActions,
 }) {
   return (
-    <div className="bg-white shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white shadow-sm border rounded-md border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
           

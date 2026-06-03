@@ -8,7 +8,7 @@ import {
   Settings, 
   ChevronLeft, 
   Menu,
-  Crown,
+  ShoppingBag,
   User2,
   FileText,
   File,
@@ -93,6 +93,15 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             active={pathname.includes("/leads")}
           />
         )}
+         {session?.user?.role === 'admin' && (
+          <NavItem 
+            href="/orders" 
+            icon={ShoppingBag} 
+            label="Orders" 
+            collapsed={collapsed} 
+            active={pathname.includes("/orders")}
+          />
+        )}
         {session?.user?.role === 'admin' && (
           <NavItem 
             href="/lead-ad" 
@@ -121,7 +130,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
         <NavItem 
           href="/calculator" 
           icon={FileQuestion} 
-          label="Calculator" 
+          label="Health Quiz Lead" 
           collapsed={collapsed} 
           active={pathname.includes("/calculator")}
         /> 

@@ -7,6 +7,7 @@ import {
   ListChecks
 } from "lucide-react";
 import Link from "next/link";
+import BackButton from "@/lib/BackButton";
 
 // --- CUSTOM HOOKS ---
 function useDebounce(value, delay) {
@@ -141,8 +142,8 @@ const [toDate, setToDate] = useState("")
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
-      
+    <div className="min-h-screen flex flex-col font-sans text-gray-900">
+      <BackButton />
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

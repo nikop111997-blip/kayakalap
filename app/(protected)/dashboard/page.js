@@ -104,7 +104,12 @@ const [range, setRange] = useState("monthly")
   trend={data.trends.leads.value}
   isPositive={data.trends.leads.positive}
 />
-
+<StatCard 
+  title="Landing Page Lead"
+  value={data.cards.totalAd}
+  trend={data.trends.adlead.value}
+  isPositive={data.trends.adlead.positive}
+/>
 <StatCard 
   title="Contacts"
   value={data.cards.totalContacts}

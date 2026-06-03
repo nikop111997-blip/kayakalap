@@ -7,6 +7,7 @@ import {
   PlusCircle
 } from "lucide-react";
 import Link from "next/link";
+import BackButton from "@/lib/BackButton";
 
 // --- CUSTOM HOOKS ---
 function useDebounce(value, delay) {
@@ -163,8 +164,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
-      
+    <div className="min-h-screen flex flex-col font-sans text-gray-900">
+      <BackButton />
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -173,7 +174,7 @@ export default function App() {
         </div>
         <Link
           href="/email/template/create"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#05335c] text-white rounded-lg hover:bg-[#184369] font-medium transition-colors shadow-sm"
         >
           <PlusCircle size={18} />
           New Template
