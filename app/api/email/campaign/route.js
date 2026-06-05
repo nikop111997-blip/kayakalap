@@ -53,6 +53,38 @@ export async function POST(req) {
 
       uniqueEmails = [...new Set(openedLogs.map((log) => log.email))];
     }
+   else if (body.audience === "not_paid") {
+  const date = new Date();
+  date.setDate(date.getDate() - 30);
+
+  const pendingOrders = await db.collection("orders").find({
+    status: "pending",
+    createdAt: { $gte: date }
+  }).toArray();
+
+  const paidEmails = await db.collection("orders").distinct(
+    "email",
+    {
+      status: "paid"
+    }
+  );
+
+  const paidSet = new Set(
+    paidEmails.map((e) => e.toLowerCase())
+  );
+
+  uniqueEmails = [
+    ...new Set(
+      pendingOrders
+        .map((o) => o.email?.trim().toLowerCase())
+        .filter(
+          (email) =>
+            email &&
+            !paidSet.has(email)
+        )
+    ),
+  ];
+}
 
     // 🚫 no users found
     if (uniqueEmails.length === 0) {

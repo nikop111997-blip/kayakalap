@@ -13,6 +13,7 @@ export async function GET(req) {
     const status = searchParams.get("status");
     const plan = searchParams.get("plan");
     const product = searchParams.get("product");
+    const source = searchParams.get("source"); // <-- New Source Parameter
 
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
@@ -21,27 +22,38 @@ export async function GET(req) {
     const maxAmount = searchParams.get("maxAmount");
 
     const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder =
-      searchParams.get("sortOrder") === "asc" ? 1 : -1;
+    const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
 
     const query = {};
 
-    // SEARCH
+    // 1. GLOBAL SEARCH (Now includes Referrer & UTMs)
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
         { phone: { $regex: search, $options: "i" } },
-        {
-          paymentRequestId: {
-            $regex: search,
-            $options: "i",
-          },
-        },
+        { paymentRequestId: { $regex: search, $options: "i" } },
+        { refferBy: { $regex: search, $options: "i" } },
+        { "utm.utm_source": { $regex: search, $options: "i" } },
+        { "utm.utm_medium": { $regex: search, $options: "i" } },
+        { "utm.utm_campaign": { $regex: search, $options: "i" } },
+        { utm_source: { $regex: search, $options: "i" } } // For flat documents
       ];
     }
 
-    // STATUS
+    // 2. SPECIFIC SOURCE FILTER
+    if (source && source !== "All") {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { refferBy: { $regex: source, $options: "i" } },
+          { "utm.utm_source": { $regex: source, $options: "i" } },
+          { utm_source: { $regex: source, $options: "i" } }
+        ]
+      });
+    }
+
+    // 3. STATUS
     if (status && status !== "All") {
       query.status = {
         $regex: `^${status}$`,
@@ -49,49 +61,44 @@ export async function GET(req) {
       };
     }
 
-    // PLAN
+    // 4. PLAN
     if (plan && plan !== "All") {
       query.plan = plan;
     }
 
-    // PRODUCT TYPE
+    // 5. PRODUCT TYPE
     if (product && product !== "All") {
       if (product === "Journal") {
         query.product = { $ne: null };
       }
-
       if (product === "Plans") {
         query.product = null;
       }
     }
 
-    // DATE RANGE
+    // 6. DATE RANGE
     if (startDate || endDate) {
       query.createdAt = {};
 
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
-
         query.createdAt.$gte = start;
       }
 
       if (endDate) {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-
         query.createdAt.$lte = end;
       }
     }
 
-    // AMOUNT RANGE
+    // 7. AMOUNT RANGE
     if (minAmount || maxAmount) {
       query.amount = {};
-
       if (minAmount) {
         query.amount.$gte = Number(minAmount);
       }
-
       if (maxAmount) {
         query.amount.$lte = Number(maxAmount);
       }
@@ -100,11 +107,7 @@ export async function GET(req) {
     const client = await clientPromise;
     const db = client.db("kayakalap");
 
-    console.log("FILTER QUERY =>", query);
-
-    const totalRecords = await db
-      .collection("orders")
-      .countDocuments(query);
+    const totalRecords = await db.collection("orders").countDocuments(query);
 
     const orders = await db
       .collection("orders")
@@ -122,23 +125,15 @@ export async function GET(req) {
       pagination: {
         totalRecords,
         currentPage: page,
-        totalPages: Math.ceil(
-          totalRecords / limit
-        ),
+        totalPages: Math.ceil(totalRecords / limit),
         limit,
       },
     });
   } catch (error) {
     console.error(error);
-
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message,
-      },
-      {
-        status: 500,
-      }
+      { success: false, message: error.message },
+      { status: 500 }
     );
   }
 }

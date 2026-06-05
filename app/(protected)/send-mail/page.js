@@ -238,6 +238,7 @@ for (let i = 0; i < 10; i++) {
                   className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
                   <option value="all">All Subscribers</option>
+                  <option value="not_paid">Plan Added But Not Paid</option>
                   <option value="last_7_days">New Subscribers (Last 7 Days)</option>
                   <option value="last_30_days">New Subscribers (Last 30 Days)</option>
                   <option value="opened_mail">Opened A Mail</option>

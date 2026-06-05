@@ -361,10 +361,10 @@ export default function EmailBuilder() {
             content: `
               <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 20px auto;">
                 <tr>
-                  <td style="padding: 0 12px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/4b5563/facebook-new.png" width="24" height="24" alt="Facebook" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
+                  <td style="padding: 0 12px;"><a href="https://www.facebook.com/KayapalatWellness/"><img src="https://img.icons8.com/ios-filled/50/4b5563/facebook-new.png" width="24" height="24" alt="Facebook" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
                   <td style="padding: 0 12px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/4b5563/twitterx--v2.png" width="24" height="24" alt="Twitter" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
-                  <td style="padding: 0 12px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/4b5563/instagram-new.png" width="24" height="24" alt="Instagram" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
-                  <td style="padding: 0 12px;"><a href="#"><img src="https://img.icons8.com/ios-filled/50/4b5563/linkedin.png" width="24" height="24" alt="LinkedIn" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
+                  <td style="padding: 0 12px;"><a href="https://www.instagram.com/kayapalatwellness/?hl=en"><img src="https://img.icons8.com/ios-filled/50/4b5563/instagram-new.png" width="24" height="24" alt="Instagram" style="display:block; border:0; outline:none; text-decoration:none;"/></a></td>
+                 
                 </tr>
               </table>
             `
@@ -377,9 +377,16 @@ export default function EmailBuilder() {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 30px;">
                 <tr>
                   <td align="center" style="padding: 20px; font-family: 'Inter', sans-serif; font-size: 12px; color: #9ca3af;">
-                    <p style="margin: 0 0 10px 0;">© 2026 Your Company Inc. All rights reserved.</p>
-                    <p style="margin: 0;">123 Business Road, Tech City, TC 12345</p>
-                    <p style="margin: 10px 0 0 0;"><a href="#" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #6b7280; text-decoration: underline;">Manage Preferences</a></p>
+                    <p style="margin: 0 0 10px 0;">© 2026 Kayapalat.in. All rights reserved.</p>
+                    <p style="margin: 0;">Sethi Building, 209, Kotri Rd, adjacent to central square mall, Ballabhbari, Gumanpura, Kota, Rajasthan 324007</p>
+                   <p style="margin: 10px 0 0 0;">
+  <a
+    href="{{unsubscribe_link}}"
+    style="color: #6b7280; text-decoration: underline;"
+  >
+    Unsubscribe
+  </a>
+</p>
                   </td>
                 </tr>
               </table>
@@ -689,7 +696,7 @@ export default function EmailBuilder() {
                   {blogs.map((blog) => (
                     <div key={blog.id} className="bg-white border border-gray-200 rounded-md p-2 hover:border-blue-300 hover:shadow transition-all group cursor-grab">
                       <div className="relative h-24 w-full rounded overflow-hidden mb-2 bg-gray-100">
-                        <img src={`https://picsum.photos/seed/${blog.id}/300/150`} alt="Cover" className="w-full h-full object-cover" />
+                        <img src={`${blog.featuredImage}`} alt="Cover" className="w-full h-full object-cover" />
                       </div>
                       <h4 className="font-semibold text-gray-800 text-[11px] leading-tight mb-1 line-clamp-2">{blog.title}</h4>
                       <h4 className="font-normal text-gray-600 text-[10px] leading-tight mb-1 line-clamp-2">{blog.metaDescription}</h4>
