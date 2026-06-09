@@ -27,6 +27,8 @@ export async function GET(req) {
     const limit = parseInt(searchParams.get("limit")) || 20;
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort");
+    const status = searchParams.get("status");
+    const plan = searchParams.get("plan");
     const fromDate = searchParams.get("fromDate");
     const toDate = searchParams.get("toDate");
     const dateFilter = searchParams.get("dateFilter");
@@ -41,17 +43,31 @@ export async function GET(req) {
     // 🔍 Search
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
+        { fullName: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
-        { ip: { $regex: search, $options: "i" } },
+        { mobile: { $regex: search, $options: "i" } },
+        { city: { $regex: search, $options: "i" } },
+        { occupation: { $regex: search, $options: "i" } },
       ];
+    }
+
+    // 📌 Status Filter
+    if (status && status !== "All") {
+      query.status = status;
+    }
+
+    // 📌 Plan Filter
+    if (plan && plan !== "All") {
+      query.plan = plan;
     }
 
     // 📅 Date Filter
     if (fromDate || toDate) {
       query.createdAt = {};
-      if (fromDate) query.createdAt.$gte = new Date(fromDate);
+
+      if (fromDate) {
+        query.createdAt.$gte = new Date(fromDate);
+      }
 
       if (toDate) {
         const to = new Date(toDate);
@@ -62,44 +78,89 @@ export async function GET(req) {
       const now = new Date();
       let from = new Date();
 
-      if (dateFilter === "Today") from.setHours(0, 0, 0, 0);
-      if (dateFilter === "Last3") from.setDate(now.getDate() - 3);
-      if (dateFilter === "Last7") from.setDate(now.getDate() - 7);
-      if (dateFilter === "Last30") from.setDate(now.getDate() - 30);
+      switch (dateFilter) {
+        case "Today":
+          from.setHours(0, 0, 0, 0);
+          break;
+        case "Last3":
+          from.setDate(now.getDate() - 3);
+          break;
+        case "Last7":
+          from.setDate(now.getDate() - 7);
+          break;
+        case "Last30":
+          from.setDate(now.getDate() - 30);
+          break;
+      }
 
       query.createdAt = { $gte: from };
     }
 
     // 🔽 Sorting
     let sortOption = { createdAt: -1 };
-    if (sort === "oldest") sortOption = { createdAt: 1 };
-    if (sort === "name") sortOption = { name: 1 };
 
-    const contacts = await db
-      .collection("popup")
+    switch (sort) {
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+
+      case "name":
+        sortOption = { fullName: 1 };
+        break;
+
+      case "city":
+        sortOption = { city: 1 };
+        break;
+
+      case "plan":
+        sortOption = { plan: 1 };
+        break;
+
+      case "status":
+        sortOption = { status: 1 };
+        break;
+    }
+
+    const leads = await db
+      .collection("plan_applications") // Change to your collection name
       .find(query)
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
       .toArray();
 
-    const total = await db.collection("popup").countDocuments(query);
+    const total = await db
+      .collection("plan_applications")
+      .countDocuments(query);
 
     return new Response(
       JSON.stringify({
-        data: contacts,
+        data: leads,
+        total,
+        page,
+        limit,
         pages: Math.ceil(total / limit),
       }),
-      { status: 200, headers: corsHeaders }
+      {
+        status: 200,
+        headers: corsHeaders,
+      }
     );
   } catch (error) {
+    console.error(error);
+
     return new Response(
-      JSON.stringify({ error: true }),
-      { status: 500, headers: corsHeaders }
+      JSON.stringify({
+        error: true,
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }
-
 // ================= POST =================
 export async function POST(req) {
   try {

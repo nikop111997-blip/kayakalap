@@ -115,7 +115,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           <NavItem 
             href="/enquiry" 
             icon={UserCircle} 
-            label="Contact From Lead" 
+            label="Pricing From Lead" 
             collapsed={collapsed} 
             active={pathname.includes("/enquiry")}
           />
