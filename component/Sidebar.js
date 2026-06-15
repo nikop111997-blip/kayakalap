@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   Settings, 
+  MessageSquareQuote,
   ChevronLeft, 
   Menu,
   ShoppingBag,
@@ -118,6 +119,15 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             label="Pricing From Lead" 
             collapsed={collapsed} 
             active={pathname.includes("/enquiry")}
+          />
+        )}
+         {session?.user?.role === 'admin' && (
+          <NavItem 
+            href="/testimonials" 
+            icon={MessageSquareQuote} 
+            label="Testimonials" 
+            collapsed={collapsed} 
+            active={pathname.includes("/testimonials")}
           />
         )}
         <NavItem 
