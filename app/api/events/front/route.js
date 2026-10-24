@@ -46,17 +46,18 @@ function getPriceRange(tickets = []) {
 
   const prices = tickets
     .map((ticket) => Number(ticket?.price))
-    .filter((price) => Number.isFinite(price));
+    .filter((price) => Number.isFinite(price) && price >= 0)
+    .sort((a, b) => a - b);
 
   if (!prices.length) {
     return "";
   }
 
-  const minPrice = Math.min(...prices);
+  // Second-lowest price, or lowest if only one price exists
+  const price = prices.length >= 2 ? prices[1] : prices[0];
 
-  return `₹${minPrice.toLocaleString("en-IN")} onwards`;
+  return `₹${price.toLocaleString("en-IN")} onwards`;
 }
-
 /* =========================================================
    EMPTY EDITOR DATA
 ========================================================= */
