@@ -351,7 +351,7 @@ const [toDate, setToDate] = useState("")
                         className="hover:bg-blue-50 cursor-pointer transition-colors group"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-medium text-gray-900 group-hover:text-blue-700">{lead.name}</div>
+                          <div className="font-medium text-gray-900 group-hover:text-blue-700">{lead.fullName}</div>
                           <div className="text-gray-500 text-xs mt-1">{lead.email}</div>
                           <div className="text-gray-500 text-xs">{lead.phone}</div>
                         </td>
