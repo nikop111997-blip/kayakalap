@@ -659,8 +659,8 @@ export default function EmailBuilder() {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:30px;">
                 <tr>
                   <td align="center" style="padding:20px; font-family:'Inter',sans-serif; font-size:12px; color:#9ca3af; line-height:1.6;" data-gjs-droppable="true">
-                    <p style="margin:0 0 10px 0;">© 2026 Your Company. All rights reserved.</p>
-                    <p style="margin:0 0 10px 0;">123 Business Rd, City, State 12345</p>
+                    <p style="margin:0 0 10px 0;">© 2026 Kayapalat. All rights reserved.</p>
+                    <p style="margin:0 0 10px 0;">Sethi Building, 209, Kotri Rd, adjacent to central square mall, Ballabhbari, Gumanpura, Kota, Rajasthan 324007</p>
                     <a href="{{unsubscribe_link}}" style="color:#6b7280; text-decoration:underline;">Unsubscribe</a>
                   </td>
                 </tr>
@@ -675,12 +675,12 @@ export default function EmailBuilder() {
                   <td align="center" style="padding:30px 20px;" data-gjs-droppable="true">
                     <table border="0" cellspacing="0" cellpadding="0" style="margin-bottom:20px;">
                       <tr>
-                        <td style="padding:0 10px;"><a href="#" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Privacy Policy</a></td>
-                        <td style="padding:0 10px;"><a href="#" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Terms of Service</a></td>
-                        <td style="padding:0 10px;"><a href="#" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Contact Us</a></td>
+                        <td style="padding:0 10px;"><a href="/privacy-policy" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Privacy Policy</a></td>
+                        <td style="padding:0 10px;"><a href="/terms-of-service" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Terms of Service</a></td>
+                        <td style="padding:0 10px;"><a href="/contact-us" style="font-family:'Inter',sans-serif; font-size:13px; color:#4b5563; text-decoration:none;">Contact Us</a></td>
                       </tr>
                     </table>
-                    <p style="font-family:'Inter',sans-serif; font-size:12px; color:#9ca3af; margin:0 0 10px 0;">© 2026 Company Name</p>
+                    <p style="font-family:'Inter',sans-serif; font-size:12px; color:#9ca3af; margin:0 0 10px 0;">© 2026 Kayapalat. All rights reserved.</p>
                     <a href="{{unsubscribe_link}}" style="font-family:'Inter',sans-serif; font-size:12px; color:#9ca3af; text-decoration:underline;">Unsubscribe</a>
                   </td>
                 </tr>
@@ -693,9 +693,9 @@ export default function EmailBuilder() {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#111827; margin-top:30px; border-radius:0 0 8px 8px;">
                 <tr>
                   <td align="center" style="padding:40px 20px; font-family:'Inter',sans-serif; font-size:12px; color:#9ca3af; line-height:1.6;" data-gjs-droppable="true">
-                    <img src="https://via.placeholder.com/100x30/111827/ffffff?text=LOGO" width="100" style="margin-bottom:20px; display:block;" />
-                    <p style="margin:0 0 10px 0;">© 2026 Your Company.</p>
-                    <p style="margin:0 0 10px 0;">123 Business Rd, City, State 12345</p>
+                    <img src="https://www.kayapalat.in/_next/image?url=https%3A%2F%2Fframerusercontent.com%2Fimages%2FmsjGzrRn1eu9rQWQOuvoSNpE2yE.png%3Fscale-down-to%3D512%26width%3D644%26height%3D164&w=256&q=75" width="100" style="margin-bottom:20px; display:block;" />
+                    <p style="margin:0 0 10px 0;">© 2026 Kayapalat. All rights reserved.</p>
+                    <p style="margin:0 0 10px 0;">Sethi Building, 209, Kotri Rd, adjacent to central square mall, Ballabhbari, Gumanpura, Kota, Rajasthan 324007</p>
                     <a href="{{unsubscribe_link}}" style="color:#d1d5db; text-decoration:underline;">Unsubscribe</a>
                   </td>
                 </tr>
