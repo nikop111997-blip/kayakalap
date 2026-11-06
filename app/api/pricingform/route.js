@@ -14,7 +14,7 @@ export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || session.user.role !== "admin" && session.user.role !== "counsellor") {
       return new Response(
         JSON.stringify({ unauthorized: true }),
         { status: 401, headers: corsHeaders }

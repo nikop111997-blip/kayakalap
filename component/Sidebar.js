@@ -85,7 +85,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
           collapsed={collapsed} 
           active={pathname === "/dashboard"} 
         />
-        {session?.user?.role === 'admin' && (
+        {session?.user?.role === 'admin' || session?.user?.role === 'counsellor' ? (
           <NavItem 
             href="/leads" 
             icon={User2} 
@@ -93,8 +93,8 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             collapsed={collapsed} 
             active={pathname.includes("/leads")}
           />
-        )}
-         {session?.user?.role === 'admin' && (
+        ) : null}
+         {session?.user?.role === 'admin' || session?.user?.role === 'counsellor' ? (
           <NavItem 
             href="/orders" 
             icon={ShoppingBag} 
@@ -102,8 +102,8 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             collapsed={collapsed} 
             active={pathname.includes("/orders")}
           />
-        )}
-        {session?.user?.role === 'admin' && (
+        ) : null}
+        {session?.user?.role === 'admin' || session?.user?.role === 'counsellor' ? (
           <NavItem 
             href="/lead-ad" 
             icon={User2} 
@@ -111,8 +111,8 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             collapsed={collapsed} 
             active={pathname.includes("/lead-ad")}
           />
-        )}
-        {session?.user?.role === 'admin' && (
+        ) : null}
+        {session?.user?.role === 'admin' || session?.user?.role === 'counsellor' ? (
           <NavItem 
             href="/enquiry" 
             icon={UserCircle} 
@@ -120,7 +120,7 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             collapsed={collapsed} 
             active={pathname.includes("/enquiry")}
           />
-        )}
+        ) : null}
          {session?.user?.role === 'admin' && (
           <NavItem 
             href="/testimonials" 
@@ -130,48 +130,48 @@ export default function Sidebar({ session, collapsed, setCollapsed }) {
             active={pathname.includes("/testimonials")}
           />
         )}
-        <NavItem 
+       { session?.user?.role !== 'counsellor' && <NavItem 
           href="/blogs" 
           icon={File} 
           label="Blogs" 
           collapsed={collapsed} 
           active={pathname.includes("/blogs")}
-        /> 
-        <NavItem 
+        /> }
+       { session?.user?.role !== 'counsellor' && <NavItem 
           href="/calculator" 
           icon={FileQuestion} 
           label="Health Quiz Lead" 
           collapsed={collapsed} 
           active={pathname.includes("/calculator")}
-        /> 
-        <NavItem 
+        /> }
+       { session?.user?.role !== 'counsellor' && <NavItem 
           href="/newsletter" 
           icon={ListChecks} 
           label="Subscribers" 
           collapsed={collapsed} 
           active={pathname.includes("/newsletter")} 
-        />
-        <NavItem 
+        /> }
+       { session?.user?.role !== 'counsellor' && <NavItem 
           href="/campaign" // Update these paths to match your actual routing
           icon={MailCheck} 
           label="Email Campaigns" 
           collapsed={collapsed} 
           active={pathname === "/campaign"}
-        />
-        <NavItem 
+        /> }
+      { session?.user?.role !== 'counsellor' && <NavItem 
           href="/email/template" // Update these paths to match your actual routing
           icon={MailIcon} 
           label="Email Templates" 
           collapsed={collapsed} 
           active={pathname === "/email/template"}
-        />
-        <NavItem 
+        />}
+       { session?.user?.role !== 'counsellor' && <NavItem 
           href="/categories" // Update these paths to match your actual routing
           icon={FileText} 
           label="Blog Categories" 
           collapsed={collapsed} 
           active={pathname === "/categories"}
-        />
+        /> }
         {session?.user?.role === 'admin' && (
           <NavItem 
             href="/staff" 
