@@ -24,8 +24,9 @@ export default async function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     > 
-    <Toaster position="top-right" />
+   
       <body className="min-h-full flex flex-col">
+         <Toaster position="top-right" />
           {children}
         </body>
     </html>
