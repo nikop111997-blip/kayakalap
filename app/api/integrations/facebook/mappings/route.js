@@ -8,9 +8,9 @@ const ALLOWED_CRM_FIELDS = [
   "fullName",
   "email",
   "phone",
-  "age",
-  "schedule",
-  "frustration",
+  "city",
+  "goal",
+  "currentWeight",
 ];
 
 const ALLOWED_STATUSES = ["new"];

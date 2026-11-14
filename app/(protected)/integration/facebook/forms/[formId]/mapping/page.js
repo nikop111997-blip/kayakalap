@@ -22,25 +22,25 @@ const PAGE_NAME = "Kayapalat Wellness";
 const CRM_FIELDS = [
   { value: "fullName", label: "Full Name" },
   { value: "email", label: "Email" },
-  { value: "phone", label: "WhatsApp Number" },
-  { value: "age", label: "Age" },
-  { value: "schedule", label: "Transformation Schedule" },
-  { value: "frustration", label: "Frustration" },
+  { value: "phone", label: "Phone Number" },
+  { value: "city", label: "City" },
+  { value: "goal", label: "Goal" },
+  { value: "currentWeight", label: "Current Weight" },
 ];
 
 const DEFAULT_STATUS = "new";
 
 function suggestField(question) {
-  const key = `${question.key || ""} ${question.label || ""} ${
-    question.type || ""
-  }`.toLowerCase();
+  const key = `${question.key || ""} ${
+    question.label || ""
+  } ${question.type || ""}`.toLowerCase();
 
   if (
     question.type === "FULL_NAME" ||
     key.includes("full name") ||
     key.includes("name")
   ) {
-    return "name";
+    return "fullName";
   }
 
   if (question.type === "EMAIL" || key.includes("email")) {
@@ -50,28 +50,29 @@ function suggestField(question) {
   if (
     question.type === "PHONE" ||
     key.includes("phone") ||
-    key.includes("mobile")
+    key.includes("mobile") ||
+    key.includes("contact number")
   ) {
-    return "whatsapp";
+    return "phone";
   }
 
-  if (key.includes("age")) {
-    return "age";
-  }
-
-  if (
-    key.includes("schedule") ||
-    key.includes("start") ||
-    key.includes("transformation")
-  ) {
-    return "schedule";
+  if (key.includes("city") || key.includes("location")) {
+    return "city";
   }
 
   if (
-    key.includes("frustration") ||
-    key.includes("problem")
+    key.includes("goal") ||
+    key.includes("weight loss") ||
+    key.includes("objective")
   ) {
-    return "frustration";
+    return "goal";
+  }
+
+  if (
+    key.includes("current weight") ||
+    key.includes("weight")
+  ) {
+    return "currentWeight";
   }
 
   return "";

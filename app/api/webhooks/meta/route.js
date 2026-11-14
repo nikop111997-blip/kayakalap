@@ -1,21 +1,23 @@
 
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
+
 import { getFacebookCollections } from "@/lib/facebook/db";
 import { decryptToken } from "@/lib/facebook/encryption";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const GRAPH_VERSION =
   process.env.META_GRAPH_API_VERSION || "v27.0";
 
 const CRM_FIELDS = [
-  "name",
+  "fullName",
   "email",
-  "whatsapp",
-  "age",
-  "schedule",
-  "frustration",
+  "phone",
+  "city",
+  "goal",
+  "currentWeight",
 ];
 
 // ---------------------------------------------
@@ -23,32 +25,48 @@ const CRM_FIELDS = [
 // ---------------------------------------------
 
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
+  try {
+    const { searchParams } = new URL(req.url);
 
-  const mode = searchParams.get("hub.mode");
-  const token = searchParams.get("hub.verify_token");
-  const challenge = searchParams.get("hub.challenge");
+    const mode = searchParams.get("hub.mode");
+    const token = searchParams.get("hub.verify_token");
+    const challenge = searchParams.get("hub.challenge");
 
-  if (
-    mode === "subscribe" &&
-    token === process.env.META_WEBHOOK_VERIFY_TOKEN
-  ) {
-    return new Response(challenge || "", {
-      status: 200,
-      headers: {
-        "Content-Type": "text/plain",
+    if (
+      mode === "subscribe" &&
+      token &&
+      token === process.env.META_WEBHOOK_VERIFY_TOKEN
+    ) {
+      return new Response(challenge || "", {
+        status: 200,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Webhook verification failed",
       },
-    });
-  }
+      { status: 403 }
+    );
+  } catch (error) {
+    console.error("Facebook webhook verification error:", error);
 
-  return NextResponse.json(
-    { success: false, message: "Webhook verification failed" },
-    { status: 403 }
-  );
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Webhook verification error",
+      },
+      { status: 500 }
+    );
+  }
 }
 
 // ---------------------------------------------
-// VERIFY META REQUEST SIGNATURE
+// VERIFY META SIGNATURE
 // ---------------------------------------------
 
 function verifyMetaSignature(rawBody, signature) {
@@ -87,7 +105,7 @@ function normalizeAnswer(value) {
     return "";
   }
 
-  return String(value);
+  return String(value).trim();
 }
 
 function getFieldData(lead) {
@@ -108,34 +126,50 @@ function buildLeadDocument(lead, mapping, pageId, formId) {
   const fieldData = getFieldData(lead);
 
   const document = {
-    name: "",
+    // Your actual CRM fields
+    fullName: "",
     email: "",
-    whatsapp: "",
-    age: "",
-    schedule: "",
-    frustration: "",
+    phone: "",
+    city: "",
+    goal: "",
+    currentWeight: "",
 
-    answers: {},
-    score: 0,
+    // Source information
+    source: "Social Media",
 
+    // Attribution information
+    metaAttribution: {
+      fbclid: null,
+      fbp: null,
+      fbc: null,
+      capturedAt: new Date(),
+    },
+
+    utm_source: "Meta",
+    utm_medium: "Ads",
+
+    // Lead timestamps
     submittedAt: lead.created_time
       ? new Date(lead.created_time).toISOString()
       : new Date().toISOString(),
 
     createdAt: new Date(),
 
-    source: "facebook-lead-ads",
+    // CRM status
     status: mapping.defaultLeadStatus || "new",
 
+    // Facebook references
     facebookLeadId: String(lead.id),
     facebookPageId: String(pageId),
     facebookFormId: String(formId),
 
+    // Additional unmapped answers
     others: {},
   };
 
   const mappedQuestionKeys = new Set();
 
+  // Apply saved form mappings.
   for (const item of mapping.mappings || []) {
     const questionKey = item.questionKey;
     const crmField = item.crmField;
@@ -157,33 +191,34 @@ function buildLeadDocument(lead, mapping, pageId, formId) {
     }
   }
 
-  // Keep every unmapped Facebook answer.
+  // Store all unmapped Facebook answers in others.
   for (const [key, values] of Object.entries(fieldData)) {
-    if (mappedQuestionKeys.has(key)) {
-      const item = (mapping.mappings || []).find(
-        (entry) => entry.questionKey === key
-      );
+    const mappingItem = (mapping.mappings || []).find(
+      (item) => item.questionKey === key
+    );
 
-      if (item?.crmField) continue;
+    if (mappingItem?.crmField && CRM_FIELDS.includes(mappingItem.crmField)) {
+      continue;
     }
 
     document.others[key] = normalizeAnswer(values);
   }
 
+  // Facebook advertising information.
   if (lead.ad_id) {
     document.facebookAdId = String(lead.ad_id);
   }
 
-  if (lead.ad_name) {
-    document.facebookAdName = lead.ad_name;
+  if (lead.form_id) {
+    document.facebookFormId = String(lead.form_id);
   }
 
-  if (lead.adset_id) {
-    document.facebookAdsetId = String(lead.adset_id);
+  if (lead.is_organic !== undefined) {
+    document.isOrganic = lead.is_organic;
   }
 
-  if (lead.campaign_id) {
-    document.facebookCampaignId = String(lead.campaign_id);
+  if (lead.platform) {
+    document.facebookPlatform = lead.platform;
   }
 
   return document;
@@ -206,9 +241,8 @@ async function fetchFacebookLead(leadgenId, accessToken) {
       "field_data",
       "form_id",
       "ad_id",
-      "ad_name",
-      "adset_id",
-      "campaign_id",
+      "is_organic",
+      "platform",
     ].join(",")
   );
 
@@ -253,17 +287,19 @@ async function processLeadEvent(value) {
     leads,
   } = await getFacebookCollections();
 
-  // Find the exact connected Page.
+  // 1. Find connected Facebook Page.
   const page = await pages.findOne({
     pageId,
     status: "connected",
   });
 
   if (!page) {
-    throw new Error(`Connected Facebook Page not found: ${pageId}`);
+    throw new Error(
+      `Connected Facebook Page not found: ${pageId}`
+    );
   }
 
-  // Find mapping for this exact Page and form.
+  // 2. Find saved mapping for exact Page and form.
   const mapping = await mappings.findOne({
     userId: String(page.userId),
     pageId,
@@ -272,15 +308,16 @@ async function processLeadEvent(value) {
 
   if (!mapping) {
     throw new Error(
-      `No saved mapping found for Page ${pageId} and Form ${formId}`
+      `Mapping not found for Facebook form: ${formId}`
     );
   }
 
+  // 3. Check Page access token.
   if (!page.pageAccessTokenEncrypted) {
     throw new Error("Facebook Page access token is missing");
   }
 
-  // Avoid fetching a lead that has already been saved.
+  // 4. Check duplicate lead.
   const existingLead = await leads.findOne({
     facebookLeadId: leadgenId,
   });
@@ -292,6 +329,7 @@ async function processLeadEvent(value) {
     };
   }
 
+  // 5. Decrypt Page access token.
   const accessToken = decryptToken(
     page.pageAccessTokenEncrypted
   );
@@ -300,12 +338,21 @@ async function processLeadEvent(value) {
     throw new Error("Unable to decrypt Facebook Page token");
   }
 
-  // Fetch the complete lead details from Meta.
+  // 6. Fetch full Facebook lead.
   const facebookLead = await fetchFacebookLead(
     leadgenId,
     accessToken
   );
 
+  // Make sure the fetched lead belongs to the expected form.
+  if (
+    facebookLead.form_id &&
+    String(facebookLead.form_id) !== formId
+  ) {
+    throw new Error("Facebook lead form ID mismatch");
+  }
+
+  // 7. Build CRM document using saved mapping.
   const leadDocument = buildLeadDocument(
     facebookLead,
     mapping,
@@ -313,7 +360,7 @@ async function processLeadEvent(value) {
     formId
   );
 
-  // Unique index makes duplicate webhook deliveries safe.
+  // 8. Insert unique index for duplicate protection.
   await leads.createIndex(
     { facebookLeadId: 1 },
     {
@@ -323,6 +370,7 @@ async function processLeadEvent(value) {
     }
   );
 
+  // 9. Insert lead.
   try {
     await leads.insertOne(leadDocument);
 
@@ -331,7 +379,6 @@ async function processLeadEvent(value) {
       leadgenId,
     };
   } catch (error) {
-    // Another webhook request may have inserted it concurrently.
     if (error.code === 11000) {
       return {
         status: "duplicate",
@@ -344,53 +391,93 @@ async function processLeadEvent(value) {
 }
 
 // ---------------------------------------------
-// POST: RECEIVE FACEBOOK LEAD WEBHOOK
+// POST: RECEIVE FACEBOOK WEBHOOK
 // ---------------------------------------------
 
 export async function POST(req) {
   try {
+    // 1. Read raw body for signature verification.
     const rawBody = await req.text();
 
     const signature = req.headers.get(
       "x-hub-signature-256"
     );
 
+    // 2. Verify request came from Meta.
     if (!verifyMetaSignature(rawBody, signature)) {
       return NextResponse.json(
-        { success: false, message: "Invalid webhook signature" },
+        {
+          success: false,
+          message: "Invalid webhook signature",
+        },
         { status: 401 }
       );
     }
 
+    // 3. Parse payload.
     const body = JSON.parse(rawBody);
 
     if (body.object !== "page") {
-      return NextResponse.json(
-        { success: true, message: "Event ignored" },
-        { status: 200 }
-      );
+      return NextResponse.json({
+        success: true,
+        message: "Event ignored",
+      });
     }
 
     const results = [];
+    const errors = [];
 
+    // 4. Process each Page event.
     for (const entry of body.entry || []) {
       for (const change of entry.changes || []) {
-        if (change.field !== "leadgen") continue;
+        if (change.field !== "leadgen") {
+          continue;
+        }
 
-        const result = await processLeadEvent(change.value || {});
-        results.push(result);
+        try {
+          const result = await processLeadEvent(
+            change.value || {}
+          );
+
+          results.push(result);
+        } catch (error) {
+          console.error(
+            "Facebook lead event failed:",
+            error.message
+          );
+
+          errors.push({
+            leadgenId: change.value?.leadgen_id || null,
+            message: error.message,
+          });
+        }
       }
     }
 
+    // If any lead failed, return 500 so Meta can retry.
+    if (errors.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Some Facebook lead events failed",
+          processed: results.length,
+          results,
+          errors,
+        },
+        { status: 500 }
+      );
+    }
+
+    // 5. Acknowledge successful delivery.
     return NextResponse.json({
       success: true,
+      message: "Facebook webhook processed successfully",
       processed: results.length,
       results,
     });
   } catch (error) {
     console.error("Facebook webhook processing error:", error);
 
-    // Non-2xx allows Meta to retry delivery.
     return NextResponse.json(
       {
         success: false,
