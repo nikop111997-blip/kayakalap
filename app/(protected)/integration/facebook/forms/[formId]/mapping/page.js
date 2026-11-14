@@ -20,9 +20,9 @@ const PAGE_ID = "249659368570089";
 const PAGE_NAME = "Kayapalat Wellness";
 
 const CRM_FIELDS = [
-  { value: "name", label: "Full Name" },
+  { value: "fullName", label: "Full Name" },
   { value: "email", label: "Email" },
-  { value: "whatsapp", label: "WhatsApp Number" },
+  { value: "phone", label: "WhatsApp Number" },
   { value: "age", label: "Age" },
   { value: "schedule", label: "Transformation Schedule" },
   { value: "frustration", label: "Frustration" },

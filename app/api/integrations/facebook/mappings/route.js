@@ -5,9 +5,9 @@ import { getFacebookCollections } from "@/lib/facebook/db";
 import { authOptions } from "@/lib/authOptions";
 
 const ALLOWED_CRM_FIELDS = [
-  "name",
+  "fullName",
   "email",
-  "whatsapp",
+  "phone",
   "age",
   "schedule",
   "frustration",
